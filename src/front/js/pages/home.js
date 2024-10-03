@@ -22,6 +22,9 @@ export const Home = () => {
 					Read documentation
 				</a>
 			</p>
+			<Link to="/author">
+				<h1>ir a author</h1>
+			</Link>
 
 			<div className="ml-auto">
 					<Link to="/category">
