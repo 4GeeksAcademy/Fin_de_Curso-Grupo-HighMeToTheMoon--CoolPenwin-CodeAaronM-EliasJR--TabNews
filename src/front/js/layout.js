@@ -11,6 +11,8 @@ import { Category } from "./pages/category";
 import { AddCategory } from "./pages/addCategory"; // Importa AddCategory aquí
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
+import { EditCategory } from "./pages/editCategory";
+import { CategoryDetails } from "./pages/categoryDetails";
 
 //create your first component
 const Layout = () => {
@@ -28,7 +30,9 @@ const Layout = () => {
                         <Route element={<Demo />} path="/demo" />
                         <Route element={<Single />} path="/single/:theid" />
                         <Route element={<Category />} path="/category" />
-                        <Route element={<AddCategory />} path="/add-category" /> {/* Añade esta línea */}
+                        <Route path="/category-details/:id" element={<CategoryDetails />} />
+                        <Route element={<AddCategory />} path="/add-category" />
+                        <Route path="/edit-category/:id" element={<EditCategory />} />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />

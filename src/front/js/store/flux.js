@@ -16,9 +16,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("Error loading categories:", error);
 				}
-				console.log(process.env.BACKEND_URL); // Agrega esto para verificar la URL
 			},
-
 
 			// Crear una nueva categoría
 			newCategory: async (category) => {
@@ -36,34 +34,33 @@ const getState = ({ getStore, getActions, setStore }) => {
 						throw new Error(`Error ${response.status}: ${errorData.message || "Unknown error"}`);
 					}
 
-					const data = await response.json();
-					setStore({ categories: [...getStore().categories, data] }); // Actualizar la lista de categorías
+					// Recargar categorías después de crear una nueva
+					await getActions().loadCategories();
 				} catch (error) {
 					console.error("Error saving category:", error);
 				}
 			},
 
 			// Editar una categoría existente
-			editCategory: async (id, category) => {
-				const apiUrl = `${process.env.BACKEND_URL}/api/category/${id}`;
-
+			updateCategory: async (id, updatedData) => {
 				try {
-					const response = await fetch(apiUrl, {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/category/${id}`, { // Cambié el endpoint a "category"
 						method: "PUT",
 						headers: {
 							"Content-Type": "application/json",
 						},
-						body: JSON.stringify(category),
+						body: JSON.stringify(updatedData),
 					});
 
 					if (!response.ok) {
 						const errorData = await response.json();
-						throw new Error(`Error ${response.status}: ${errorData.message || "Error editing category."}`);
+						throw new Error(`Error ${response.status}: ${errorData.message || "Unknown error"}`);
 					}
 
-					await getActions().loadCategories(); // Recargar categorías después de editar
+					// Recargar categorías después de editar
+					await getActions().loadCategories();
 				} catch (error) {
-					console.error("Error editing category:", error);
+					console.error("Error updating category:", error);
 				}
 			},
 
@@ -75,11 +72,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 					});
 					if (!response.ok) throw new Error("Failed to delete category");
 
-					await getActions().loadCategories(); // Recargar categorías después de eliminar
+					// Recargar categorías después de eliminar
+					await getActions().loadCategories();
 				} catch (error) {
 					console.error("Failed to delete category:", error);
 				}
-			}
+			},
 		}
 	};
 };
