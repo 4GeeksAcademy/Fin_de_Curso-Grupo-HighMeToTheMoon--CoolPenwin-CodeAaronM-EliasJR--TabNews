@@ -11,7 +11,8 @@ import { Category } from "./pages/category";
 import { AddCategory } from "./pages/addCategory"; // Importa AddCategory aquí
 import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
-
+import { AddAuthor } from "./pages/AddAuthor";
+import { Author } from "./pages/Author";
 //create your first component
 const Layout = () => {
     const basename = process.env.BASENAME || "";
@@ -24,11 +25,13 @@ const Layout = () => {
                 <ScrollToTop>
                     <Navbar />
                     <Routes>
-                        <Route element={<Home />} path="/" />
-                        <Route element={<Demo />} path="/demo" />
-                        <Route element={<Single />} path="/single/:theid" />
-                        <Route element={<Category />} path="/category" />
-                        <Route element={<AddCategory />} path="/add-category" /> {/* Añade esta línea */}
+                        <Route element={<Home />} path="/"/>
+                        <Route element={<Demo />} path="/demo"/>
+                        <Route element={<Single />} path="/single/:theid"/>
+                        <Route element={<Category />} path="/category"/>
+                        <Route element={<AddCategory />} path="/add-category"/> {/* Añade esta línea */}
+                        <Route element={<Author />} path="/author"/>
+                        <Route element={<AddAuthor />} path="/AddAuthor"/>
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
