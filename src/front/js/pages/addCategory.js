@@ -1,27 +1,32 @@
 // src/front/js/pages/AddCategory.js
 import React, { useState, useContext } from "react";
-import { Form, Button, Modal } from "react-bootstrap";
+import { Form, Button } from "react-bootstrap";
 import { Context } from "../store/appContext"; // Asegúrate de que la ruta sea correcta
-import { useNavigate } from "react-router-dom"; // Importa useNavigate
-import { Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // Importa useNavigate y Link
+import Swal from "sweetalert2"; // Importa SweetAlert2
 
 export const AddCategory = () => {
     const { actions } = useContext(Context);
     const [newCategory, setNewCategory] = useState({ name: "", description: "" });
-    const [showModal, setShowModal] = useState(false); // Estado para el modal
     const navigate = useNavigate(); // Inicializa useNavigate
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         await actions.newCategory(newCategory);
 
-        // Muestra el modal de confirmación
-        setShowModal(true);
-    };
+        // Muestra la alerta de éxito centrada en la pantalla
+        Swal.fire({
+            position: "center", // Cambia la posición a centro
+            icon: "success",
+            title: "New category added",
+            showConfirmButton: false,
+            timer: 1500
+        });
 
-    const handleCloseModal = () => {
-        setShowModal(false);
-        navigate("/categories"); // Redirigir a la vista de categorías al cerrar el modal
+        // Redirigir a la vista de categorías después de la alerta
+        setTimeout(() => {
+            navigate("/category");
+        }, 1500);
     };
 
     return (
@@ -47,25 +52,17 @@ export const AddCategory = () => {
                         onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
                     />
                 </Form.Group>
-                <Button variant="primary" type="submit" className="mt-3">
-                    Add Category
-                </Button>
-            </Form>
-
-            {/* Modal de confirmación */}
-            <Modal show={showModal} onHide={handleCloseModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Category Added</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>Nueva categoría añadida correctamente.</Modal.Body>
-                <Modal.Footer>
-                <Link to="/category">
-                    <Button variant="secondary" onClick={handleCloseModal}>
-                        Close
+                <div className="d-flex justify-content-between mt-3">
+                    <Button variant="primary" type="submit">
+                        Add Category
                     </Button>
-                </Link>
-                </Modal.Footer>
-            </Modal>
+                    <Link to="/category">
+                        <Button variant="secondary">
+                            Back to Categories
+                        </Button>
+                    </Link>
+                </div>
+            </Form>
         </div>
     );
 };
