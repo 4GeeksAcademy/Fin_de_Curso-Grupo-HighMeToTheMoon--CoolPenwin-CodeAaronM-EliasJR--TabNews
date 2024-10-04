@@ -82,6 +82,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 			getData: () => {
+				console.log("getData");
+				console.log(url_author);
+				
 				fetch(url_author)
 					.then(response => response.json())
 					.then(data => {

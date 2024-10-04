@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Category, Author
+from api.models import db, User, Category, Newspaper , Author
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -294,3 +294,79 @@ def update_author(author_id):
     return jsonify({'message': f'Usuario con id {author_id} ha sido actualizado correctamente'}), 200
 
 
+#--------------crud newspaper----------------
+
+
+@api.route('/newspaper', methods=['GET'])
+def get_newspaper():
+    all_newspapers = Newspaper.query.all()
+    newspapers = list(map(lambda character: character.serialize(),all_newspapers))
+    return jsonify(newspapers), 200
+
+@api.route('/newspaper/<int:newspaper_id>', methods=['GET'])
+def get_newspaper_by_id(newspaper_id):
+    newspaper = Newspaper.query.filter_by(id=newspaper_id).first()
+
+    if newspaper is None:
+        return jsonify({"error": "newspaper not found"}), 404
+
+    return jsonify(newspaper.serialize()), 200
+
+@api.route('/newspaper', methods=['POST'])
+def post_newspaper():
+    body = request.get_json()
+
+    if not body:
+        return jsonify({'error': 'Request body must be JSON'}), 400
+
+    if 'name' not in body:
+        return jsonify({'error': 'Name is required'}), 400
+    if 'description' not in body:
+        return jsonify({'error': 'Description is required'}), 400
+    if 'photo' not in body:
+        return jsonify({'error': 'Photo is required'}), 400
+    
+    if body['name'] == '':
+        return jsonify({'error': 'Name cannot be empty'}), 400
+    
+    newspaper = Newspaper(**body)
+    try:
+        db.session.add(newspaper)
+        db.session.commit()
+        return jsonify({'message': 'Newspaper created successfully'}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+@api.route('/newspaper/<int:newspaper_id>', methods=['DELETE'])
+def delete_newspaper_by_id(newspaper_id):
+    newspaper = Newspaper.query.filter_by(id=newspaper_id).first()
+
+    if newspaper is None:
+        return jsonify({"error": "newspaper not found"}), 404
+    
+    db.session.delete(newspaper)
+    db.session.commit()
+
+    return jsonify(newspaper.serialize()), 200
+
+@api.route('/newspaper/<int:newspaper_id>', methods=['PUT'])
+def update_newspaper(newspaper_id):
+    request_body_newspaper = request.get_json()
+
+    newspaper = Newspaper.query.get(newspaper_id)
+
+    if not newspaper:
+        return jsonify({'message': "Usuario no encontrado"}), 404
+
+    if "name" in request_body_newspaper:
+        newspaper.name = request_body_newspaper["name"]
+    if "description" in request_body_newspaper:
+        newspaper.description = request_body_newspaper["description"]
+    if "photo" in request_body_newspaper:
+        newspaper.photo = request_body_newspaper["photo"]
+        
+        db.session.commit()
+
+    return jsonify({'message': f'Usuario con id {newspaper_id} ha sido actualizado correctamente'}), 200

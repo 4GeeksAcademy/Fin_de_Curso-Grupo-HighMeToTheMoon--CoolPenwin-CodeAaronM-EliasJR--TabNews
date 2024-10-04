@@ -22,8 +22,14 @@ export const Home = () => {
 					Read documentation
 				</a>
 			</p>
+			<div className="ml-auto">
+					<Link to="/newspaper">
+						<button className="btn btn-primary">NewsPapers</button>
+					</Link>
+			</div>
+
 			<Link to="/author">
-				<h1>ir a author</h1>
+				<button className="btn btn-primary">ir a author</button>
 			</Link>
 
 			<div className="ml-auto">

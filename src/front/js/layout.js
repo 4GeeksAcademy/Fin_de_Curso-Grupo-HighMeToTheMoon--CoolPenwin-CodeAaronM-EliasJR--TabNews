@@ -13,6 +13,11 @@ import { Navbar } from "./component/navbar";
 import { Footer } from "./component/footer";
 import { EditCategory } from "./pages/editCategory";
 import { CategoryDetails } from "./pages/categoryDetails";
+
+import { Newspaper } from "./pages/Newspaper";
+import { AddNewspaper } from "./pages/NewspaperAdd"; 
+import { EditNewspaper } from "./pages/NewspaperEdit";
+import { NewspaperDetails } from "./pages/NewspaperDetails";
 import { AddAuthor } from "./pages/AddAuthor";
 import { Author } from "./pages/Author";
 //create your first component
@@ -34,6 +39,10 @@ const Layout = () => {
                         <Route path="/category-details/:id" element={<CategoryDetails />} />
                         <Route element={<AddCategory />} path="/add-category"/>
                         <Route path="/edit-category/:id" element={<EditCategory />} />
+                        <Route element={<Newspaper />} path="/newspaper"/>
+                        <Route path="/newspaper-details/:id" element={<NewspaperDetails />} />
+                        <Route element={<AddNewspaper />} path="/add-newspaper"/>
+                        <Route path="/edit-newspaper/:id" element={<EditNewspaper />} />
                         <Route element={<Author />} path="/author"/>
                         <Route element={<AddAuthor />} path="/AddAuthor"/>
                         <Route element={<h1>Not found!</h1>} />
