@@ -10,9 +10,6 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
 
-
-    # interests = db.relationship('InterestUser', back_populates='user')
-
     def __repr__(self):
         return f"<User {self.first_name} {self.last_name}, Email: {self.email}>"
 
@@ -29,8 +26,6 @@ class Category(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
 
-    # articles = db.relationship('Article', secondary='article_category', back_populates='categories')
-
     def __repr__(self):
         return f"<Category {self.name}>"
 
@@ -40,15 +35,33 @@ class Category(db.Model):
             'name': self.name,
             'description': self.description
         }
+
+class UserCategory(db.Model):
+    __tablename__ = 'user_categories'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+
+    user = db.relationship('User', backref='user_categories')
+    category = db.relationship('Category', backref='user_categories')
+
+    def __repr__(self):
+        return f"<UserCategory User ID: {self.user_id}, Category ID: {self.category_id}>"
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'category_id': self.category_id,
+        }
+    
 class Author(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     photo = db.Column(db.String(255))
 
-    # articles = db.relationship('Article', back_populates='author')
-
-    def repr(self):
+    def __repr__(self):
         return f"<Author {self.name}>"
 
     def serialize(self):
@@ -58,6 +71,7 @@ class Author(db.Model):
             'description': self.description,
             'photo': self.photo
         }
+<<<<<<< HEAD
     
 class Newspaper(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -79,3 +93,5 @@ class Newspaper(db.Model):
             'logo': self.logo,
             'link': self.link
         }
+=======
+>>>>>>> develop

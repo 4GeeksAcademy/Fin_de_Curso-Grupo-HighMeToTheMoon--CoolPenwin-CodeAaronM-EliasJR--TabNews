@@ -2,7 +2,11 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
+<<<<<<< HEAD
 from api.models import db, User, Category, Author, Newspaper
+=======
+from api.models import db, User, Category, UserCategory, Author
+>>>>>>> develop
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -215,6 +219,58 @@ def delete_category(category_id):
     db.session.commit()
 
     return jsonify({'message': f'Categoría con id {category_id} ha sido borrada'}), 200
+
+############# C.R.U.D USER CATEGORY ##############
+
+@api.route('/user-category', methods=['GET'])
+def get_user_categories():
+    user_categories = UserCategory.query.all()
+    results = list(map(lambda item: item.serialize(), user_categories))
+    
+    if not user_categories:
+        return jsonify(message="No se han encontrado relaciones entre usuarios y categorías"), 404
+
+    return jsonify(results), 200
+
+@api.route('/user-category/<int:user_id>', methods=['GET'])
+def get_user_categories_by_user(user_id):
+    user_categories = UserCategory.query.filter_by(user_id=user_id).all()
+    
+    if not user_categories:
+        return jsonify(message="No se han encontrado categorías para este usuario"), 404
+
+    results = list(map(lambda item: item.serialize(), user_categories))
+    return jsonify(results), 200
+
+@api.route('/user-category', methods=['POST'])
+def add_user_category():
+    request_body = request.get_json()
+
+    if "user_id" not in request_body or "category_id" not in request_body:
+        return jsonify({"error": "Datos incompletos, se necesita user_id y category_id"}), 400
+
+    new_user_category = UserCategory(
+        user_id=request_body["user_id"],
+        category_id=request_body["category_id"]
+    )
+
+    db.session.add(new_user_category)
+    db.session.commit()
+
+    return jsonify({"msg": "Relación entre usuario y categoría añadida correctamente"}), 200
+
+@api.route('/user-category/<int:user_category_id>', methods=['DELETE'])
+def delete_user_category(user_category_id):
+    user_category = UserCategory.query.get(user_category_id)
+
+    if not user_category:
+        return jsonify({'message': "Relación no encontrada"}), 404
+
+    db.session.delete(user_category)
+    db.session.commit()
+
+    return jsonify({'message': f'Relación con id {user_category_id} ha sido eliminada'}), 200
+
 
 #--------------crud author----------------
 
