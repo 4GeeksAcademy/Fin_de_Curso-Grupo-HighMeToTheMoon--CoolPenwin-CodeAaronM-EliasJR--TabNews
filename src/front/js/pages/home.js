@@ -22,6 +22,9 @@ export const Home = () => {
 					Read documentation
 				</a>
 			</p>
+			<Link to="/newspaper">
+				<h1>ir a piriodico</h1>
+			</Link>
 			<Link to="/author">
 				<h1>ir a author</h1>
 			</Link>

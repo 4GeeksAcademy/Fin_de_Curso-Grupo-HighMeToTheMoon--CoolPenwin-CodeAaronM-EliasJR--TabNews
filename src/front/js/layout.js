@@ -15,6 +15,8 @@ import { EditCategory } from "./pages/editCategory";
 import { CategoryDetails } from "./pages/categoryDetails";
 import { AddAuthor } from "./pages/AddAuthor";
 import { Author } from "./pages/Author";
+import { AddNewspaper } from "./pages/AddNewspaper";
+import { Newspaper } from "./pages/Newspaper";
 //create your first component
 const Layout = () => {
     const basename = process.env.BASENAME || "";
@@ -36,6 +38,8 @@ const Layout = () => {
                         <Route path="/edit-category/:id" element={<EditCategory />} />
                         <Route element={<Author />} path="/author"/>
                         <Route element={<AddAuthor />} path="/AddAuthor"/>
+                        <Route element={<Newspaper />} path="/newspaper"/>
+                        <Route element={<AddNewspaper />} path="/AddNewspaper"/>
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />

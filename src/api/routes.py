@@ -322,7 +322,7 @@ def post_newspaper():
         return jsonify({'error': 'Name is required'}), 400
     if 'description' not in body:
         return jsonify({'error': 'Description is required'}), 400
-    if 'photo' not in body:
+    if 'logo' not in body:
         return jsonify({'error': 'Photo is required'}), 400
     
     if body['name'] == '':
@@ -363,8 +363,8 @@ def update_newspaper(newspaper_id):
         newspaper.name = request_body_newspaper["name"]
     if "description" in request_body_newspaper:
         newspaper.description = request_body_newspaper["description"]
-    if "photo" in request_body_newspaper:
-        newspaper.photo = request_body_newspaper["photo"]
+    if "logo" in request_body_newspaper:
+        newspaper.logo = request_body_newspaper["logo"]
         
         db.session.commit()
 
