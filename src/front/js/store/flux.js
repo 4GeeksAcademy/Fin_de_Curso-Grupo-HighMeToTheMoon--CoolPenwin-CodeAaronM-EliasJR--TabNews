@@ -147,7 +147,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			setid: (props) => {
 				setStore({ temp: props });
 				console.log("ID para editar:", props); // Asegúrate de que el ID correcto se está almacenando
-			}
+			},
 
 		}
 	};
