@@ -58,3 +58,24 @@ class Author(db.Model):
             'description': self.description,
             'photo': self.photo
         }
+    
+class Newspaper(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    logo = db.Column(db.String(255))
+    link = db.Column(db.String(255))
+
+    # articles = db.relationship('Article', back_populates='newspaper')
+
+    def repr(self):
+        return f"<Newspaper {self.name}>"
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'logo': self.logo,
+            'link': self.link
+        }
