@@ -149,7 +149,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 			setid: (props) => {
 				setStore({ temp: props });
 				console.log("ID para editar:", props); // Asegúrate de que el ID correcto se está almacenando
-<<<<<<< HEAD
 			},		
 			getNewspaper: () => {
 				fetch(url_newspaper)
@@ -221,9 +220,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 			}
 		
 		
-=======
-			},
->>>>>>> develop
 
 		
 		}

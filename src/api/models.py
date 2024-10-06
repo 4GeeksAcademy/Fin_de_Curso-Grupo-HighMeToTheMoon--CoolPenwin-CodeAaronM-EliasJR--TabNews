@@ -71,7 +71,6 @@ class Author(db.Model):
             'description': self.description,
             'photo': self.photo
         }
-<<<<<<< HEAD
     
 class Newspaper(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -93,5 +92,3 @@ class Newspaper(db.Model):
             'logo': self.logo,
             'link': self.link
         }
-=======
->>>>>>> develop
