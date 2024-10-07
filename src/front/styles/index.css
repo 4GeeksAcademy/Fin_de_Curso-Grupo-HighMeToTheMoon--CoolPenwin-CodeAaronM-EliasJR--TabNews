@@ -1,3 +1,19 @@
 /* 
     General Styles used on every website (Don't Repeat Yourself)
 */
+
+
+  /* footer */
+
+  .logo {
+    cursor: pointer;
+    transition: 0.2s;
+    transition: box-shadow 0.3s ease, transform 0.3s ease, opacity 2s ease;
+    transform: scale(1);
+    background: linear-gradient(to bottom right, 105, 165, 214, 105, 165, 214);
+  }
+  .logo:hover {
+    transform: scale(1.9) translateZ(20px);
+  }
+
+ /* /fin/footer  */ 
