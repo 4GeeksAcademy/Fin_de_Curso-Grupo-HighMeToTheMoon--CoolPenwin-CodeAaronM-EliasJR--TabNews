@@ -346,7 +346,7 @@ def update_author(author_id):
     return jsonify({'message': f'Usuario con id {author_id} ha sido actualizado correctamente'}), 200
 
 
-# CRUD Newspaper
+# CRUD Newspaper ----------------------------------------
 
 @api.route('/newspaper', methods=['GET'])
 def get_newspaper():
@@ -375,7 +375,9 @@ def post_newspaper():
     if 'description' not in body:
         return jsonify({'error': 'Description is required'}), 400
     if 'logo' not in body:
-        return jsonify({'error': 'Photo is required'}), 400
+        return jsonify({'error': 'Logo is required'}), 400
+    if 'link' not in body:
+        return jsonify({'error': 'Link is required'}), 400
     
     if body['name'] == '':
         return jsonify({'error': 'Name cannot be empty'}), 400
@@ -417,6 +419,8 @@ def update_newspaper(newspaper_id):
         newspaper.description = request_body_newspaper["description"]
     if "logo" in request_body_newspaper:
         newspaper.logo = request_body_newspaper["logo"]
+    if "link" in request_body_newspaper:
+        newspaper.link = request_body_newspaper["link"]
         
         db.session.commit()
 

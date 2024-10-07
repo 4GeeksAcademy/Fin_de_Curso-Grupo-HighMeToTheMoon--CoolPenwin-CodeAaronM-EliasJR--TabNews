@@ -23,10 +23,10 @@ export const Home = () => {
 				</a>
 			</p>
 			<Link to="/newspaper">
-				<h1>ir a piriodico</h1>
+				<h1>ir a Periodicos</h1>
 			</Link>
 			<Link to="/author">
-				<h1>ir a author</h1>
+				<h1>ir a Authors</h1>
 			</Link>
 
 			<div className="ml-auto">
