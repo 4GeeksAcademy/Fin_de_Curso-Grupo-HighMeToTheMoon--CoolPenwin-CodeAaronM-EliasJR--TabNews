@@ -1,11 +1,7 @@
   
 import os
 from flask_admin import Admin
-<<<<<<< HEAD
-from .models import db, User, Category, Author, Newspaper
-=======
-from .models import db, User, Category, UserCategory, Author
->>>>>>> develop
+from .models import db, User, Category, UserCategory, Author, Newspaper
 from flask_admin.contrib.sqla import ModelView
 
 def setup_admin(app):
