@@ -1,6 +1,7 @@
 // flux.js
 const getState = ({ getStore, getActions, setStore }) => {
-	let url_author = process.env.BACKEND_URL + "api/author/";
+	let url_author = process.env.BACKEND_URL + "api/author/"
+	let url_newspaper = process.env.BACKEND_URL + "api/newspaper/"
 	return {
 		store: {
 			message: null,
@@ -10,12 +11,13 @@ const getState = ({ getStore, getActions, setStore }) => {
 			Auth: false,
 			token: null, // Asegúrate de que hay un campo para el token
 			homepageMessage: null, // Almacena el mensaje de la homepage
+			Newspapers: [],
 		},
 		actions: {
 			// Cargar categorías desde la API
 			loadCategories: async () => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/category`);
+					const response = await fetch(`${process.env.BACKEND_URL}api/category`);
 					if (!response.ok) throw new Error("Failed to load categories");
 					const data = await response.json();
 					setStore({ categories: data });
@@ -176,7 +178,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			// Función para inicio de sesión
-			// Función para inicio de sesión
 			login: async (credentials) => {
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}api/login`, {
@@ -224,7 +225,71 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ token: null, homepageMessage: null }); // Limpia el token y el mensaje de la homepage
 				localStorage.removeItem("token"); // Elimina el token del local storage
 				console.log("Sesión cerrada");
+			},		
+			getNewspaper: () => {
+				fetch(url_newspaper)
+					.then(response => response.json())
+					.then(data => {
+						setStore({ Newspapers: data });
+						console.log("data de dev");
+						console.log(data);
+					})
+					.catch(error => console.error("Error fetching Newspapers:", error));
 			},
+			addNewspaper: (props) => {
+				const actions = getActions();
+				const store = getStore();
+				if (store.temp.length === 0) {
+					const requestOptions = {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							'name': props.name,
+							'description': props.description,
+							'logo': props.logo,
+							'link': props.link
+						})
+					};
+					console.log(props); // Aquí imprimes los valores de props
+					fetch(url_newspaper, requestOptions)
+						.then((Response) => Response.json())
+						.then(() => actions.getNewspaper())
+						.catch((error) => {
+							console.error("Error fetching the data:", error);
+						});
+				} else {
+					actions.changeNewspaper(props);
+				}
+			},
+			deleteNewspaper: (props) => {
+				const actions = getActions()
+				console.log("you are going to delete " + props)
+				fetch(url_newspaper+props, { method: 'DELETE' })
+					.then(() => { actions.getNewspaper() });
+			},
+			changeNewspaper: (props) => {
+				const store = getStore();
+				const actions = getActions()
+				const requestOptions = {
+					method: 'PUT',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						'name': props.name,
+						'description': props.description,
+						'logo': props.logo,
+						'link': props.link,
+						'id': props.id
+					}),
+					redirect: "follow"
+				};
+				fetch(url_newspaper+props.id, requestOptions)
+					.then(response => response.json())
+					.then(data => {
+						actions.getNewspaper()
+						console.log(props.id)
+						setStore({ temp: [] })
+					});
+			}
 
 		}
 	};

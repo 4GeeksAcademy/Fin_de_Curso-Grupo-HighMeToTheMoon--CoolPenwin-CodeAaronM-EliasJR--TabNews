@@ -21,7 +21,11 @@ export const Home = () => {
 					<button className="btn btn-primary">Ver autores</button>
 				</Link>
 			</div>
-
+			<div className="ml-auto mb-2">
+			<Link to="/newspaper">
+				<button className="btn btn-primary">ir a Periodicos</button>
+			</Link>
+			</div>
 			<div className="ml-auto">
 				<Link to="/category">
 					<button className="btn btn-primary">Ver Categorías</button>

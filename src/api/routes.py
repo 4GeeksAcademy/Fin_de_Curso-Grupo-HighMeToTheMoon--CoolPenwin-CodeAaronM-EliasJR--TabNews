@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Category, Author
+from api.models import db, User, Category, UserCategory, Author, Newspaper
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
@@ -193,7 +193,60 @@ def delete_category(category_id):
 
     return jsonify({'message': f'Categoría con id {category_id} ha sido borrada'}), 200
 
-############# C.R.U.D AUTHOR ##############
+############# C.R.U.D USER CATEGORY ##############
+
+@api.route('/user-category', methods=['GET'])
+def get_user_categories():
+    user_categories = UserCategory.query.all()
+    results = list(map(lambda item: item.serialize(), user_categories))
+    
+    if not user_categories:
+        return jsonify(message="No se han encontrado relaciones entre usuarios y categorías"), 404
+
+    return jsonify(results), 200
+
+@api.route('/user-category/<int:user_id>', methods=['GET'])
+def get_user_categories_by_user(user_id):
+    user_categories = UserCategory.query.filter_by(user_id=user_id).all()
+    
+    if not user_categories:
+        return jsonify(message="No se han encontrado categorías para este usuario"), 404
+
+    results = list(map(lambda item: item.serialize(), user_categories))
+    return jsonify(results), 200
+
+@api.route('/user-category', methods=['POST'])
+def add_user_category():
+    request_body = request.get_json()
+
+    if "user_id" not in request_body or "category_id" not in request_body:
+        return jsonify({"error": "Datos incompletos, se necesita user_id y category_id"}), 400
+
+    new_user_category = UserCategory(
+        user_id=request_body["user_id"],
+        category_id=request_body["category_id"]
+    )
+
+    db.session.add(new_user_category)
+    db.session.commit()
+
+    return jsonify({"msg": "Relación entre usuario y categoría añadida correctamente"}), 200
+
+@api.route('/user-category/<int:user_category_id>', methods=['DELETE'])
+def delete_user_category(user_category_id):
+    user_category = UserCategory.query.get(user_category_id)
+
+    if not user_category:
+        return jsonify({'message': "Relación no encontrada"}), 404
+
+    db.session.delete(user_category)
+    db.session.commit()
+
+    return jsonify({'message': f'Relación con id {user_category_id} ha sido eliminada'}), 200
+
+
+#--------------crud author----------------
+
 
 @api.route('/author', methods=['GET'])
 def get_author():
@@ -333,3 +386,82 @@ def login():
 @jwt_required()  # Solo los usuarios autenticados pueden acceder a esta vista
 def homepage():
     return jsonify(message="Bienvenido a la página principal"), 200
+# CRUD Newspaper ----------------------------------------
+
+@api.route('/newspaper', methods=['GET'])
+def get_newspaper():
+    all_newspapers = Newspaper.query.all()
+    newspapers = list(map(lambda character: character.serialize(),all_newspapers))
+    return jsonify(newspapers), 200
+
+@api.route('/newspaper/<int:newspaper_id>', methods=['GET'])
+def get_newspaper_by_id(newspaper_id):
+    newspaper = Newspaper.query.filter_by(id=newspaper_id).first()
+
+    if newspaper is None:
+        return jsonify({"error": "newspaper not found"}), 404
+
+    return jsonify(newspaper.serialize()), 200
+
+@api.route('/newspaper', methods=['POST'])
+def post_newspaper():
+    body = request.get_json()
+
+    if not body:
+        return jsonify({'error': 'Request body must be JSON'}), 400
+
+    if 'name' not in body:
+        return jsonify({'error': 'Name is required'}), 400
+    if 'description' not in body:
+        return jsonify({'error': 'Description is required'}), 400
+    if 'logo' not in body:
+        return jsonify({'error': 'Logo is required'}), 400
+    if 'link' not in body:
+        return jsonify({'error': 'Link is required'}), 400
+    
+    if body['name'] == '':
+        return jsonify({'error': 'Name cannot be empty'}), 400
+    
+    newspaper = Newspaper(**body)
+    try:
+        db.session.add(newspaper)
+        db.session.commit()
+        return jsonify({'message': 'Newspaper created successfully'}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+@api.route('/newspaper/<int:newspaper_id>', methods=['DELETE'])
+def delete_newspaper_by_id(newspaper_id):
+    newspaper = Newspaper.query.filter_by(id=newspaper_id).first()
+
+    if newspaper is None:
+        return jsonify({"error": "newspaper not found"}), 404
+    
+    db.session.delete(newspaper)
+    db.session.commit()
+
+    return jsonify(newspaper.serialize()), 200
+
+@api.route('/newspaper/<int:newspaper_id>', methods=['PUT'])
+def update_newspaper(newspaper_id):
+    request_body_newspaper = request.get_json()
+
+    newspaper = Newspaper.query.get(newspaper_id)
+
+    if not newspaper:
+        return jsonify({'message': "Usuario no encontrado"}), 404
+
+    if "name" in request_body_newspaper:
+        newspaper.name = request_body_newspaper["name"]
+    if "description" in request_body_newspaper:
+        newspaper.description = request_body_newspaper["description"]
+    if "logo" in request_body_newspaper:
+        newspaper.logo = request_body_newspaper["logo"]
+    if "link" in request_body_newspaper:
+        newspaper.link = request_body_newspaper["link"]
+        
+        db.session.commit()
+
+    return jsonify({'message': f'Usuario con id {newspaper_id} ha sido actualizado correctamente'}), 200

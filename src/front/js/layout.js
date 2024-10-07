@@ -20,7 +20,9 @@ import { Author } from "./pages/Author";
 import { HomePage } from "./pages/homePage"; // Cambié esto para que coincida con el nombre correcto
 import { ProtectedRoute } from "./component/protectedRoute";
 import Logout from "./pages/logout";
-
+import { AddNewspaper } from "./pages/AddNewspaper";
+import { Newspaper } from "./pages/Newspaper";
+//create your first component
 const Layout = () => {
     const basename = process.env.BASENAME || "";
 
@@ -39,8 +41,6 @@ const Layout = () => {
                         <Route path="/category-details/:id" element={<CategoryDetails />} />
                         <Route element={<AddCategory />} path="/add-category" />
                         <Route path="/edit-category/:id" element={<EditCategory />} />
-                        <Route element={<Author />} path="/author" />
-                        <Route element={<AddAuthor />} path="/add-author" />
                         <Route element={<Login />} path="/login" />
                         <Route element={<Register />} path="/register" />
                         <Route element={<ProtectedRoute />} path="/homePage">
@@ -49,6 +49,10 @@ const Layout = () => {
                         <Route element={<ProtectedRoute />} path="/logout"> 
                             <Route element={<Logout />} />
                         </Route>
+                        <Route element={<Author />} path="/author"/>
+                        <Route element={<AddAuthor />} path="/AddAuthor"/>
+                        <Route element={<Newspaper />} path="/newspaper"/>
+                        <Route element={<AddNewspaper />} path="/AddNewspaper"/>
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />
