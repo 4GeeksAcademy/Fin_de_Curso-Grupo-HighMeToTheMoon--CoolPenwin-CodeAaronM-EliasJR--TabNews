@@ -17,7 +17,7 @@ import { AddAuthor } from "./pages/AddAuthor";
 import Register from "./pages/register";
 import Login from "./pages/login";
 import { Author } from "./pages/Author";
-import { HomePage } from "./pages/homePage"; // Cambié esto para que coincida con el nombre correcto
+import { HomePrivado } from "./pages/homePrivado"; // Cambié esto para que coincida con el nombre correcto
 import { ProtectedRoute } from "./component/protectedRoute";
 import Logout from "./pages/logout";
 import { AddNewspaper } from "./pages/AddNewspaper";
@@ -44,15 +44,15 @@ const Layout = () => {
                         <Route element={<Login />} path="/login" />
                         <Route element={<Register />} path="/register" />
                         <Route element={<ProtectedRoute />} path="/homePage">
-                            <Route element={<HomePage />} /> {/* Asegúrate de que HomePage está correctamente importado */}
+                            <Route element={<HomePrivado />} /> {/* Asegúrate de que HomePrivado está correctamente importado */}
                         </Route>
-                        <Route element={<ProtectedRoute />} path="/logout"> 
+                        <Route element={<ProtectedRoute />} path="/logout">
                             <Route element={<Logout />} />
                         </Route>
-                        <Route element={<Author />} path="/author"/>
-                        <Route element={<AddAuthor />} path="/AddAuthor"/>
-                        <Route element={<Newspaper />} path="/newspaper"/>
-                        <Route element={<AddNewspaper />} path="/AddNewspaper"/>
+                        <Route element={<Author />} path="/author" />
+                        <Route element={<AddAuthor />} path="/AddAuthor" />
+                        <Route element={<Newspaper />} path="/newspaper" />
+                        <Route element={<AddNewspaper />} path="/AddNewspaper" />
                         <Route element={<h1>Not found!</h1>} />
                     </Routes>
                     <Footer />

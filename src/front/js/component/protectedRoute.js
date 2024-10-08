@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Context } from '../store/appContext'; // Ajusta la ruta según sea necesario
-import { HomePage } from '../pages/homePage';
+import { HomePrivado } from '../pages/homePrivado';
 
 export const ProtectedRoute = () => {
     const { store } = useContext(Context);
@@ -10,6 +10,6 @@ export const ProtectedRoute = () => {
     const token = localStorage.getItem("token");
     const isAuthenticated = token !== null;
 
-    // Si el usuario está autenticado, renderiza HomePage; de lo contrario, redirige a /login
-    return isAuthenticated ? <HomePage /> : <Navigate to="/login" />;
+    // Si el usuario está autenticado, renderiza HomePrivado; de lo contrario, redirige a /login
+    return isAuthenticated ? <HomePrivado /> : <Navigate to="/login" />;
 };
