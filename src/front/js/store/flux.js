@@ -12,7 +12,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			// Cargar categorías desde la API
 			loadCategories: async () => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/category`);
+					const response = await fetch(`${process.env.BACKEND_URL}api/category`);
 					if (!response.ok) throw new Error("Failed to load categories");
 					const data = await response.json();
 					setStore({ categories: data });
@@ -24,7 +24,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			// Crear una nueva categoría
 			newCategory: async (category) => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/category`, {
+					const response = await fetch(`${process.env.BACKEND_URL}api/category`, {
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
@@ -47,7 +47,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			// Editar una categoría existente
 			updateCategory: async (id, updatedData) => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/category/${id}`, { // Cambié el endpoint a "category"
+					const response = await fetch(`${process.env.BACKEND_URL}api/category/${id}`, { // Cambié el endpoint a "category"
 						method: "PUT",
 						headers: {
 							"Content-Type": "application/json",
@@ -70,7 +70,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			// Eliminar una categoría
 			deleteCategory: async (id) => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/category/${id}`, {
+					const response = await fetch(`${process.env.BACKEND_URL}api/category/${id}`, {
 						method: "DELETE",
 					});
 					if (!response.ok) throw new Error("Failed to delete category");
@@ -81,6 +81,19 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("Failed to delete category:", error);
 				}
 			},
+
+			getUserCategories: async () => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/user-category`);
+					if (!response.ok) throw new Error("Failed to load user categories");
+
+					const data = await response.json();
+					setStore({ userCategories: data }); // Actualizar el estado con las categorías del usuario
+				} catch (error) {
+					console.error("Error loading user categories:", error);
+				}
+			},
+			
 			getData: () => {
 				fetch(url_author)
 					.then(response => response.json())

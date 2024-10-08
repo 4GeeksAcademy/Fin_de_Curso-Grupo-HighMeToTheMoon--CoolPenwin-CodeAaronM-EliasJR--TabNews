@@ -3,6 +3,8 @@ import { Context } from "../store/appContext";
 import rigoImageUrl from "../../img/rigo-baby.jpg";
 import "../../styles/home.css";
 import { Link } from "react-router-dom";
+import { UserCategories } from "./userCategory";
+
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
@@ -31,6 +33,7 @@ export const Home = () => {
 						<button className="btn btn-primary">Ver Categorías</button>
 					</Link>
 				</div>
+			<UserCategories />
 		</div>
 	);
 };
