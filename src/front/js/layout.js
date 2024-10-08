@@ -22,6 +22,8 @@ import { ProtectedRoute } from "./component/protectedRoute";
 import Logout from "./pages/logout";
 import { AddNewspaper } from "./pages/AddNewspaper";
 import { Newspaper } from "./pages/Newspaper";
+import { Article } from "./pages/Article";
+import { AddArticle } from "./pages/addArticle";
 //create your first component
 const Layout = () => {
     const basename = process.env.BASENAME || "";
@@ -42,6 +44,8 @@ const Layout = () => {
                         <Route element={<AddCategory />} path="/add-category" />
                         <Route path="/edit-category/:id" element={<EditCategory />} />
                         <Route element={<Login />} path="/login" />
+                        <Route element={<Article />} path="/article" />
+                        <Route element={<AddArticle />} path="/AddArticle" />
                         <Route element={<Register />} path="/register" />
                         <Route element={<ProtectedRoute />} path="/homePage">
                             <Route element={<HomePage />} /> {/* Asegúrate de que HomePage está correctamente importado */}
