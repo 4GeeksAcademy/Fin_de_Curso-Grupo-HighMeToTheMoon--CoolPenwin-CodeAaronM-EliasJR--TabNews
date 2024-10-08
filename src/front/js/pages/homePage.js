@@ -16,7 +16,7 @@ export const HomePage = () => {
             // Si el token está presente, solicita el contenido de la homepage
             actions.getHomepage();
         }
-    }, [actions, navigate]);
+    }, []);
 
     return (
         <div className="container mt-5">

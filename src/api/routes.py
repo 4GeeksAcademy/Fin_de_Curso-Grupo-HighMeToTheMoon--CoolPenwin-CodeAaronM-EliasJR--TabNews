@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Category, UserCategory, Author, Newspaper
+from api.models import db, User, Category, UserCategory, Author, Newspaper, Article
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
@@ -465,3 +465,62 @@ def update_newspaper(newspaper_id):
         db.session.commit()
 
     return jsonify({'message': f'Usuario con id {newspaper_id} ha sido actualizado correctamente'}), 200
+
+#---------------------------------Articles---------------------------
+
+
+@api.route('/article', methods=['GET'])
+def get_article():
+    all_articles = Article.query.all()
+    articles = list(map(lambda article: article.serialize(), all_articles))
+    return jsonify(articles), 200
+
+@api.route('/article/<int:article_id>', methods=['GET'])
+def get_article_by_id(article_id):
+    article = Article.query.filter_by(id=article_id).first()
+
+    if article is None:
+        return jsonify({"error": "article not found"}), 404
+
+    return jsonify(article.serialize()), 200
+
+@api.route('/article', methods=['POST'])
+def post_article():
+    body = request.get_json()
+
+    if not body:
+        return jsonify({'error': 'Request body must be JSON'}), 400
+
+    article = Article(**body)
+    try:
+        db.session.add(article)
+        db.session.commit()
+        return jsonify({'message': 'Article created successfully'}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@api.route('/article/<int:article_id>', methods=['DELETE'])
+def delete_article_by_id(article_id):
+    article = Article.query.filter_by(id=article_id).first()
+
+    if article is None:
+        return jsonify({"error": "article not found"}), 404
+
+    db.session.delete(article)
+    db.session.commit()
+
+    return jsonify(article.serialize()), 200
+
+@api.route('/article/<int:article_id>', methods=['PUT'])
+def update_article(article_id):
+    request_body_article = request.get_json()
+
+    article = Article.query.get(article_id)
+
+    if not article:
+        return jsonify({'message': "article no encontrado"}), 404
+
+    db.session.commit()
+
+    return jsonify({'message': f'article con id {article_id} ha sido actualizado correctamente'}), 200

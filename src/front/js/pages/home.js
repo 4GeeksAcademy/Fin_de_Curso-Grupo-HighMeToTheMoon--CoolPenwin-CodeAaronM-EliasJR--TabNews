@@ -26,10 +26,15 @@ export const Home = () => {
 				<button className="btn btn-primary">ir a Periodicos</button>
 			</Link>
 			</div>
-			<div className="ml-auto">
+			<div className="ml-auto mb-2">
 				<Link to="/category">
 					<button className="btn btn-primary">Ver Categorías</button>
 				</Link>
+			</div>
+			<div className="ml-auto mb-2">
+			<Link to="/article">
+				<button className="btn btn-primary">ir a Articulos</button>
+			</Link>
 			</div>
 		</div>
 	);
