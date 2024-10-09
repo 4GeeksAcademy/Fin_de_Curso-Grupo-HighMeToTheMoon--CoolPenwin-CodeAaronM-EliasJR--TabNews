@@ -20,8 +20,7 @@ export const CardArticle = (props) => {
       author: props.author,
       newspaper: props.newspaper,
       category: props.category
-    });
-  };
+    });};
 
   return (
     <>
@@ -42,9 +41,9 @@ export const CardArticle = (props) => {
           <p className="card-text m-0">published_date: {props.published_date}</p>
           <p className="card-text m-0">source: {props.source}</p>
           <p className="card-text m-0">link: {props.link}</p>
-          <p className="card-text m-0">author: {props.author}</p>
-          <p className="card-text m-0">newspaper: {props.newspaper}</p>
-          <p className="card-text m-0">category: {props.category}</p>
+          <p className="card-text m-0">author: {props.author.name}</p>
+          <p className="card-text m-0">newspaper: {props.newspaper.name}</p>
+          <p className="card-text m-0">category: {props.category.name}</p>
           <p className="card-text m-0">id: {props.id}</p>
         </div>
       </div>
