@@ -28,9 +28,9 @@ export const AddArticle = () => {
             setPublishedDate(store.temp.published_date);
             setSource(store.temp.source);
             setLink(store.temp.link);
-            setAuthor_id(store.temp.author_id);
-            setNewspaper_id(store.temp.newspaper);
-            setCategory_id(store.temp.category);
+            setAuthor_id(store.temp.author.id);
+            setNewspaper_id(store.temp.newspaper.id);
+            setCategory_id(store.temp.category.id);
             setId(store.temp.id); // Setea el id cuando editas un artículo
         }
     }, [store.temp]);
@@ -240,9 +240,9 @@ export const AddArticle = () => {
                     published_date={article.published_date}
                     source={article.source}
                     link={article.link}
-                    author={article.author.name}
-                    newspaper={article.newspaper.name}
-                    category={article.category.name}
+                    author={article.author}
+                    newspaper={article.newspaper}
+                    category={article.category}
                     id={article.id}
                 />
                 ))}

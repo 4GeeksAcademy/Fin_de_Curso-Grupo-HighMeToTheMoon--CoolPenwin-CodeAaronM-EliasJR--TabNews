@@ -34,9 +34,9 @@ export const Article = () => {
 						published_date={article.published_date}
 						source={article.source}
 						link={article.link}
-						author={article.author.name}
-						newspaper={article.newspaper.name}
-						category={article.category.name}
+						author={article.author}
+						newspaper={article.newspaper}
+						category={article.category}
 						id={article.id}
 					/>
 				))}

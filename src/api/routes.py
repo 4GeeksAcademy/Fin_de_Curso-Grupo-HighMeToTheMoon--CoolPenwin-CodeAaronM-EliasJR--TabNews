@@ -514,13 +514,36 @@ def delete_article_by_id(article_id):
 
 @api.route('/article/<int:article_id>', methods=['PUT'])
 def update_article(article_id):
-    request_body_article = request.get_json()
-
+    request_body_article = request.get_json()  # Obtén los datos del cuerpo de la solicitud
     article = Article.query.get(article_id)
-
+    
     if not article:
         return jsonify({'message': "article no encontrado"}), 404
 
-    db.session.commit()
+    try:
+        # Actualiza los campos del artículo con los valores del request
+        if 'title' in request_body_article:
+            article.title = request_body_article['title']
+        if 'content' in request_body_article:
+            article.content = request_body_article['content']
+        if 'image' in request_body_article:
+            article.image = request_body_article['image']
+        if 'published_date' in request_body_article:
+            article.published_date = request_body_article['published_date']
+        if 'source' in request_body_article:
+            article.source = request_body_article['source']
+        if 'link' in request_body_article:
+            article.link = request_body_article['link']
+        if 'author_id' in request_body_article:
+            article.author_id = request_body_article['author_id']
+        if 'newspaper_id' in request_body_article:
+            article.newspaper_id = request_body_article['newspaper_id']
+        if 'category_id' in request_body_article:
+            article.category_id = request_body_article['category_id']
 
-    return jsonify({'message': f'article con id {article_id} ha sido actualizado correctamente'}), 200
+        # Guarda los cambios en la base de datos
+        db.session.commit()
+        return jsonify({'message': f'article con id {article_id} ha sido actualizado correctamente'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
