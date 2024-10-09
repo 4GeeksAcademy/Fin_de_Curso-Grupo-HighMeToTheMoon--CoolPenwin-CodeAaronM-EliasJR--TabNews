@@ -21,20 +21,19 @@ const getState = ({ getStore, getActions, setStore }) => {
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}/api/homePage`, {
 						headers: {
-							Authorization: `Bearer ${localStorage.getItem("token")}` // Usa el token del local storage
+							Authorization: `Bearer ${localStorage.getItem("token")}`
 						}
 					});
-					if (!response.ok) throw new Error("Failed to load homepage content");
-
+					if (!response.ok) throw new Error("Failed to load homepage content");					
 					const data = await response.json();
-					setStore({ homepageMessage: data.message }); // Asegúrate de que data.message sea la propiedad correcta
+					setStore({ homepageMessage: data.message }); 
 					console.log(data)
 				} catch (error) {
 					console.error("Error fetching homepage content:", error);
-					setStore({ homepageMessage: "Error fetching content" }); // Establece un mensaje de error en el store
+					setStore({ homepageMessage: "Error fetching content" }); 
 				}
 			},
-			// Cargar categorías desde la API
+
 			loadCategories: async () => {
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}api/category`);
@@ -46,7 +45,69 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			// Obtener autores
+			newCategory: async (category) => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/category`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(category),
+					});
+					if (!response.ok) {
+						const errorData = await response.json();
+						throw new Error(`Error ${response.status}: ${errorData.message || "Unknown error"}`);
+					}
+					await getActions().loadCategories();
+				} catch (error) {
+					console.error("Error saving category:", error);
+				}
+			},
+
+			updateCategory: async (id, updatedData) => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/category/${id}`, {
+						method: "PUT",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(updatedData),
+					});
+					if (!response.ok) {
+						const errorData = await response.json();
+						throw new Error(`Error ${response.status}: ${errorData.message || "Unknown error"}`);
+					}
+					await getActions().loadCategories();
+				} catch (error) {
+					console.error("Error updating category:", error);
+				}
+			},
+
+			deleteCategory: async (id) => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/category/${id}`, {
+						method: "DELETE",
+					});
+					if (!response.ok) throw new Error("Failed to delete category");
+
+					await getActions().loadCategories();
+				} catch (error) {
+					console.error("Failed to delete category:", error);
+				}
+			},
+			
+			getUserCategories: async () => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/user-category`);
+					if (!response.ok) throw new Error("Failed to load user categories");
+			
+					const data = await response.json();
+					setStore({ userCategories: data }); 
+				} catch (error) {
+					console.error("Error loading user categories:", error);
+				}
+			},
+
 			getData: async () => {
 				try {
 					const response = await fetch(url_author);
@@ -59,7 +120,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			// Crear un nuevo autor
 			addAuthor: async (props) => {
 				const actions = getActions();
 				if (getStore().temp.length === 0) {
@@ -71,7 +131,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					try {
 						const response = await fetch(url_author, requestOptions);
 						if (!response.ok) throw new Error("Error al agregar autor");
-						await actions.getData(); // Actualiza la lista de autores
+						await actions.getData();
 					} catch (error) {
 						console.error("Error al agregar autor:", error);
 					}
@@ -80,19 +140,17 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			// Eliminar un autor
 			deleteAuthor: async (id) => {
 				const actions = getActions();
 				try {
 					const response = await fetch(url_author + id, { method: 'DELETE' });
 					if (!response.ok) throw new Error("Error al eliminar autor");
-					await actions.getData(); // Actualiza la lista de autores
+					await actions.getData();
 				} catch (error) {
 					console.error("Error al eliminar autor:", error);
 				}
 			},
 
-			// Actualizar un autor
 			changeAuthor: async (props) => {
 				const actions = getActions();
 				const requestOptions = {
@@ -103,24 +161,22 @@ const getState = ({ getStore, getActions, setStore }) => {
 				try {
 					const response = await fetch(url_author + props.id, requestOptions);
 					if (!response.ok) throw new Error("Error al actualizar autor");
-					await actions.getData(); // Actualiza la lista de autores
+					await actions.getData();
 				} catch (error) {
 					console.error("Error al actualizar autor:", error);
 				}
 			},
 
-			// Obtener periódicos
 			getNewspaper: () => {
 				fetch(url_newspaper)
 					.then(response => response.json())
 					.then(data => {
-						console.log("Data de periódicos: ", data); // Verifica aquí los datos
+						console.log("Data de periódicos: ", data); 
 						setStore({ Newspapers: data });
 					})
 					.catch(error => console.log("Error al cargar los periódicos:", error));
 			},
 
-			// Agregar un periódico
 			addNewspaper: async (props) => {
 				const actions = getActions();
 				if (getStore().temp.length === 0) {
@@ -132,7 +188,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					try {
 						const response = await fetch(url_newspaper, requestOptions);
 						if (!response.ok) throw new Error("Error al agregar periódico");
-						await actions.getNewspaper(); // Actualiza la lista de periódicos
+						await actions.getNewspaper();
 					} catch (error) {
 						console.error("Error al agregar periódico:", error);
 					}
@@ -141,19 +197,17 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			// Eliminar un periódico
 			deleteNewspaper: async (id) => {
 				const actions = getActions();
 				try {
 					const response = await fetch(url_newspaper + id, { method: 'DELETE' });
 					if (!response.ok) throw new Error("Error al eliminar periódico");
-					await actions.getNewspaper(); // Actualiza la lista de periódicos
+					await actions.getNewspaper();
 				} catch (error) {
 					console.error("Error al eliminar periódico:", error);
 				}
 			},
 
-			// Actualizar un periódico
 			changeNewspaper: async (props) => {
 				const actions = getActions();
 				const requestOptions = {
@@ -164,13 +218,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 				try {
 					const response = await fetch(url_newspaper + props.id, requestOptions);
 					if (!response.ok) throw new Error("Error al actualizar periódico");
-					await actions.getNewspaper(); // Actualiza la lista de periódicos
+					await actions.getNewspaper();
 				} catch (error) {
 					console.error("Error al actualizar periódico:", error);
 				}
 			},
 
-			// Obtener artículos
 			getDataArticle: async () => {
 				try {
 					const response = await fetch(url_article);
@@ -183,7 +236,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			// Agregar un artículo
 			addArticle: async (props) => {
 				const actions = getActions();
 				if (getStore().temp.length === 0) {
@@ -195,7 +247,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					try {
 						const response = await fetch(url_article, requestOptions);
 						if (!response.ok) throw new Error("Error al agregar artículo");
-						await actions.getDataArticle(); // Actualiza la lista de artículos
+						await actions.getDataArticle();
 					} catch (error) {
 						console.error("Error al agregar artículo:", error);
 					}
@@ -204,19 +256,17 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
-			// Eliminar un artículo
 			deleteArticle: async (id) => {
 				const actions = getActions();
 				try {
 					const response = await fetch(url_article + id, { method: 'DELETE' });
 					if (!response.ok) throw new Error("Error al eliminar artículo");
-					await actions.getDataArticle(); // Actualiza la lista de artículos
+					await actions.getDataArticle();
 				} catch (error) {
 					console.error("Error al eliminar artículo:", error);
 				}
 			},
 
-			// Actualizar un artículo
 			changeArticle: async (props) => {
 				const actions = getActions();
 				const requestOptions = {
@@ -227,13 +277,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 				try {
 					const response = await fetch(url_article + props.id, requestOptions);
 					if (!response.ok) throw new Error("Error al actualizar artículo");
-					await actions.getDataArticle(); // Actualiza la lista de artículos
+					await actions.getDataArticle();
 				} catch (error) {
 					console.error("Error al actualizar artículo:", error);
 				}
 			},
 
-			// Función para registro de usuario
 			signup: async (userData) => {
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}/api/signup`, {
@@ -250,14 +299,13 @@ const getState = ({ getStore, getActions, setStore }) => {
 					}
 
 					const data = await response.json();
-					console.log(data.msg); // Mensaje de éxito
+					console.log(data.msg);
 
 				} catch (error) {
 					console.error("Error signing up:", error);
 				}
 			},
-
-			// Función para inicio de sesión
+		
 			login: async (credentials) => {
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}api/login`, {
@@ -272,24 +320,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 						const errorData = await response.json();
 						throw new Error(`Error ${response.status}: ${errorData.message || "Unknown error"}`);
 					}
-
 					const data = await response.json();
 					setStore({ token: data.access_token });
 					localStorage.setItem("token", data.access_token);
 					console.log("Inicio de sesión exitoso, token:", data.access_token);
-
-				} catch (error) {
-					console.error("Error logging in:", error);
-				}
+					} catch (error) {
+						console.error("Error logging in:", error);
+					}
 			},
 
-			// Función para cerrar sesión
 			logout: () => {
 				localStorage.removeItem("token");
 				setStore({ token: null });
 				console.log("Sesión cerrada");
-			}
+			},
 
+			setid: (props) => {
+				setStore({ temp: props });
+				console.log("ID para editar:", props); 
+			},
 		}
 	};
 };

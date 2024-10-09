@@ -3,7 +3,8 @@ import { Context } from "../store/appContext";
 import rigoImageUrl from "../../img/rigo-baby.jpg";
 import "../../styles/home.css";
 import { Link } from "react-router-dom";
-import Register from "./register";
+import { UserCategories } from "./userCategory";
+
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
