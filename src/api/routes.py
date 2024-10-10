@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Category, UserCategory, Author, Newspaper, Article
+from api.models import db, User, Category, UserCategory, Author, Newspaper, Article, Administrator
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
@@ -547,3 +547,168 @@ def update_article(article_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+
+#----------------CRUD ADMIN------------
+
+
+@api.route('/administrator', methods=['GET'])
+def get_administrator():
+    administrators = Administrator.query.all()
+    resultados = list(map(lambda item: item.serialize(), administrators))
+
+    if not administrators:
+        return jsonify(message="No se han encontrado usuarios"), 404
+
+    return jsonify(resultados), 200
+
+@api.route('/administrator/<int:administrator_id>', methods=['GET'])
+def get_administrator2(administrator_id):
+    administrator = Administrator.query.get(administrator_id)
+
+    if administrator is None:
+        return jsonify(message="Usuario no encontrado"), 404
+
+    return jsonify(administrator.serialize()), 200
+
+@api.route('/administrator', methods=['POST'])
+def add_new_administrator():
+    request_body_administrator = request.get_json()
+
+    if (
+        "first_name" not in request_body_administrator
+        or "last_name" not in request_body_administrator
+        or "email" not in request_body_administrator
+        or "password" not in request_body_administrator
+    ):
+        return jsonify({"error": "Datos incompletos"}), 400
+
+    existing_administrator = Administrator.query.filter_by(email=request_body_administrator["email"]).first()
+    if existing_administrator:
+        return jsonify({"error": "El correo ya está registrado"}), 400
+
+    hashed_password = bcrypt.generate_password_hash(request_body_administrator["password"]).decode('utf-8')
+
+    new_administrator = Administrator(
+        first_name=request_body_administrator["first_name"],
+        last_name=request_body_administrator["last_name"],
+        email=request_body_administrator["email"],
+        password=hashed_password,
+    )
+
+    try:
+        db.session.add(new_administrator)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+    response_body = {
+        "msg": "Nuevo usuario añadido correctamente"
+    }
+
+    return jsonify(response_body), 201
+
+@api.route('/administrator/<int:administrator_id>', methods=['PUT'])
+def update_administrator(administrator_id):
+    request_body_administrator = request.get_json()
+
+    administrator = Administrator.query.get(administrator_id)
+    
+    if not administrator:
+        return jsonify({'message': "Usuario no encontrado"}), 404
+
+    if "first_name" in request_body_administrator:
+        administrator.first_name = request_body_administrator["first_name"]
+    if "last_name" in request_body_administrator:
+        administrator.last_name = request_body_administrator["last_name"]
+    if "email" in request_body_administrator:
+        existing_administrator = Administrator.query.filter_by(email=request_body_administrator["email"]).first()
+        if existing_administrator and existing_administrator.id != administrator_id:
+            return jsonify({"error": "El correo ya está en uso por otro usuario"}), 400
+        administrator.email = request_body_administrator["email"]
+    if "password" in request_body_administrator:
+        administrator.password = bcrypt.generate_password_hash(request_body_administrator["password"]).decode('utf-8')
+
+    db.session.commit()
+
+    return jsonify({'message': f'Usuario con id {administrator_id} ha sido actualizado correctamente'}), 200
+
+@api.route('/administrator/<int:administrator_id>', methods=['DELETE'])
+def delete_administrator(administrator_id):
+    administrator = Administrator.query.get(administrator_id)
+
+    if not administrator:
+        return jsonify({'message': "Usuario no encontrado"}), 404
+
+    db.session.delete(administrator)
+    db.session.commit()
+
+    return jsonify({'message': f'Usuario con id {administrator_id} ha sido borrado'}), 200
+
+#-----------------ADMIN LOGIN*SIGNUP-------------
+
+
+@api.route('/administratorSignup', methods=['POST'])
+def administratorSignup():
+    request_body_administrator = request.get_json()
+
+    if (
+        "first_name" not in request_body_administrator
+        or "last_name" not in request_body_administrator
+        or "email" not in request_body_administrator
+        or "password" not in request_body_administrator
+    ):
+        return jsonify({"error": "Datos incompletos"}), 400
+
+    existing_administrator = Administrator.query.filter_by(email=request_body_administrator["email"]).first()
+    if existing_administrator:
+        return jsonify({"error": "El correo ya está registrado"}), 400
+
+    hashed_password = bcrypt.generate_password_hash(request_body_administrator["password"]).decode('utf-8')
+
+    new_administrator = Administrator(
+        first_name=request_body_administrator["first_name"],
+        last_name=request_body_administrator["last_name"],
+        email=request_body_administrator["email"],
+        password=hashed_password,
+    )
+
+    try:
+        db.session.add(new_administrator)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+    response_body = {
+        "msg": "Nuevo usuario añadido correctamente"
+    }
+
+    return jsonify(response_body), 201
+
+@api.route('/administratorLogin', methods=['POST'])
+def administratorLogin():
+    # Obtener el cuerpo de la solicitud JSON
+    request_body_administrator = request.get_json()
+
+    if "email" not in request_body_administrator or "password" not in request_body_administrator:
+        return jsonify({"error": "Correo y contraseña son requeridos"}), 400
+
+    # Consultar el usuario en la base de datos usando el correo electrónico
+    administrator = Administrator.query.filter_by(email=request_body_administrator["email"]).first()
+
+    # Verificar que el usuario existe y que la contraseña sea correcta
+    if not administrator or not bcrypt.check_password_hash(administrator.password, request_body_administrator["password"]):
+        return jsonify({"error": "Correo o contraseña incorrectos"}), 401
+
+    # Crear un token de acceso usando el ID del usuario
+    access_token = create_access_token(identity=administrator.id)
+
+    # Retornar el token de acceso
+    return jsonify(access_token=access_token), 200
+
+@api.route('/administratorHomePage', methods=['GET'])
+@jwt_required()  # Solo los usuarios autenticados pueden acceder a esta vista
+def administratorhomepage():
+    return jsonify(message="Bienvenido a la página principal"), 200

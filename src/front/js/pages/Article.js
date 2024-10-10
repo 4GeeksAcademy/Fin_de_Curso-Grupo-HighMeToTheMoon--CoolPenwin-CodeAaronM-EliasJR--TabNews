@@ -16,7 +16,7 @@ export const Article = () => {
 			<h1>Hello Rigo!!</h1>
 			<h1 className="text-danger">Articles</h1>
 			
-			<Link to="/">
+			<Link to="/administratorHomePage">
 				<h2>Get back to home</h2>
 			</Link>
 			

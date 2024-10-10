@@ -22,6 +22,9 @@ export const Navbar = () => {
                     <Link to="/login">
                         <button className="btn btn-primary">Iniciar Sesión</button>
                     </Link>
+                    <Link to="/AdministratorLogin">
+                        <button className="btn btn-primary">Iniciar Sesión admin</button>
+                    </Link>
                     <button className="btn btn-danger ml-2" onClick={handleLogout}>
                         Cerrar Sesión
                     </button>

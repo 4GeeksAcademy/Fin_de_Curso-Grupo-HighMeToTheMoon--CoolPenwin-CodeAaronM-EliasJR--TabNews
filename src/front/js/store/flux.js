@@ -339,6 +339,67 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ temp: props });
 				console.log("ID para editar:", props); 
 			},
+			administratorSignup: async (userData) => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/administratorSignup`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(userData),
+					});
+
+					if (!response.ok) {
+						const errorData = await response.json();
+						throw new Error(`Error ${response.status}: ${errorData.message || "Unknown error"}`);
+					}
+
+					const data = await response.json();
+					console.log(data.msg);
+
+				} catch (error) {
+					console.error("Error signing up:", error);
+				}
+			},
+		
+			administratorLogin: async (credentials) => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}api/administratorLogin`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(credentials),
+					});
+
+					if (!response.ok) {
+						const errorData = await response.json();
+						throw new Error(`Error ${response.status}: ${errorData.message || "Unknown error"}`);
+					}
+					const data = await response.json();
+					setStore({ token: data.access_token });
+					localStorage.setItem("token", data.access_token);
+					console.log("Inicio de sesión exitoso, token:", data.access_token);
+					} catch (error) {
+						console.error("Error logging in:", error);
+					}
+			},
+			getAdministratorHomepage: async () => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/homePage`, {
+						headers: {
+							Authorization: `Bearer ${localStorage.getItem("token")}`
+						}
+					});
+					if (!response.ok) throw new Error("Failed to load homepage content");					
+					const data = await response.json();
+					setStore({ homepageMessage: data.message }); 
+					console.log(data)
+				} catch (error) {
+					console.error("Error fetching homepage content:", error);
+					setStore({ homepageMessage: "Error fetching content" }); 
+				}
+			},
 		}
 	};
 };
