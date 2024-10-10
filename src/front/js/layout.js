@@ -24,6 +24,10 @@ import { AddNewspaper } from "./pages/AddNewspaper";
 import { Newspaper } from "./pages/Newspaper";
 import { Article } from "./pages/Article";
 import { AddArticle } from "./pages/addArticle";
+import { AdministratorHomePage } from "./pages/administratorHomePage";
+import { AdministratorProtectedRoute } from "./component/administratorProtectedRoute";
+import AdministratorLogin from "./pages/administratorLogin";
+import AdministratorRegister from "./pages/administratorRegister";
 //create your first component
 const Layout = () => {
     const basename = process.env.BASENAME || "";
@@ -53,6 +57,11 @@ const Layout = () => {
                         <Route element={<ProtectedRoute />} path="/logout"> 
                             <Route element={<Logout />} />
                         </Route>
+                        <Route element={<AdministratorLogin />} path="/administratorLogin" />
+                        <Route element={<AdministratorProtectedRoute />} path="/administratorHomePage">
+                        <Route element={<AdministratorHomePage />} />
+                        </Route>
+                        <Route element={<AdministratorRegister />} path="/administratorRegister" />
                         <Route element={<Author />} path="/author"/>
                         <Route element={<AddAuthor />} path="/AddAuthor"/>
                         <Route element={<Newspaper />} path="/newspaper"/>

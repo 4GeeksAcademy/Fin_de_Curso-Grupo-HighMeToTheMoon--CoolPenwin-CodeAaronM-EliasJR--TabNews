@@ -93,7 +93,7 @@ export const Category = () => {
                 </tbody>
             </Table>
 
-            <Link to="/">
+            <Link to="/administratorHomePage">
                 <Button variant="secondary" className="mt-4">
                     Back home
                 </Button>
