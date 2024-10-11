@@ -216,21 +216,38 @@ def get_user_categories_by_user(user_id):
     return jsonify(results), 200
 
 @api.route('/user-category', methods=['POST'])
-def add_user_category():
+@jwt_required()
+def save_user_categories():
+    user_id = get_jwt_identity()
     request_body = request.get_json()
 
-    if "user_id" not in request_body or "category_id" not in request_body:
-        return jsonify({"error": "Datos incompletos, se necesita user_id y category_id"}), 400
+    selected_categories = request_body.get('selectedCategories', [])
+    
+    if not selected_categories:
+        # Si no hay categorías seleccionadas, elimina todas las preferencias del usuario
+        UserCategory.query.filter_by(user_id=user_id).delete()
+        db.session.commit()
+        return jsonify({"msg": "All user categories removed successfully"}), 200
 
-    new_user_category = UserCategory(
-        user_id=request_body["user_id"],
-        category_id=request_body["category_id"]
-    )
+    # Obtén las categorías actuales del usuario
+    current_categories = UserCategory.query.filter_by(user_id=user_id).all()
+    current_category_ids = {cat.category_id for cat in current_categories}
 
-    db.session.add(new_user_category)
+    # Agregar nuevas categorías y eliminar las que ya no están seleccionadas
+    for category_id in selected_categories:
+        if category_id not in current_category_ids:
+            new_user_category = UserCategory(user_id=user_id, category_id=category_id)
+            db.session.add(new_user_category)
+
+    # Eliminar categorías que ya no están seleccionadas
+    for category_id in current_category_ids:
+        if category_id not in selected_categories:
+            UserCategory.query.filter_by(user_id=user_id, category_id=category_id).delete()
+
     db.session.commit()
+    
+    return jsonify({"msg": "User categories updated successfully"}), 200
 
-    return jsonify({"msg": "Relación entre usuario y categoría añadida correctamente"}), 200
 
 @api.route('/user-category/<int:user_category_id>', methods=['DELETE'])
 def delete_user_category(user_category_id):

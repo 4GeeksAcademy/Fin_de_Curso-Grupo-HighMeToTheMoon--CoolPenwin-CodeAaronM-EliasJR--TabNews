@@ -5,42 +5,58 @@ import { CardArticle } from "../component/cardArticle";
 
 export const Home = () => {
     const { store, actions } = useContext(Context);
-    const [selectedCategory, setSelectedCategory] = useState(""); // Estado para categoría seleccionada
+    const [selectedCategories, setSelectedCategories] = useState([]); // Estado para las categorías seleccionadas
+    const [showFilters, setShowFilters] = useState(false); // Estado para mostrar u ocultar los filtros
 
     useEffect(() => {
         actions.getDataArticle();
-		actions.loadCategories();
+        actions.loadCategories();
     }, []);
 
-    // Función para manejar el cambio de categoría
+    // Función para manejar el cambio de categorías
     const handleCategoryChange = (category) => {
-        setSelectedCategory(category);
+        if (selectedCategories.includes(category)) {
+            // Si la categoría ya está seleccionada, la quitamos
+            setSelectedCategories(selectedCategories.filter((cat) => cat !== category));
+        } else {
+            // Si la categoría no está seleccionada, la agregamos
+            setSelectedCategories([...selectedCategories, category]);
+        }
     };
 
-    // Filtrar artículos por la categoría seleccionada
-    const filteredArticles = selectedCategory
-        ? store.Articles.filter((article) => article.category.name === selectedCategory)
+    // Filtrar artículos por las categorías seleccionadas
+    const filteredArticles = selectedCategories.length > 0
+        ? store.Articles.filter((article) => selectedCategories.includes(article.category.name))
         : store.Articles;
 
     return (
         <div className="text-center mt-5">
             <h1 className="text-danger">HOMEE</h1>
 
-            {/* Botones para seleccionar la categoría */}
+            {/* Botón para mostrar u ocultar los filtros */}
             <div className="my-4">
-                <button onClick={() => handleCategoryChange("")} className="btn btn-secondary mx-2">
-                    Todas
+                <button onClick={() => setShowFilters(!showFilters)} className="btn btn-info">
+                    {showFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
                 </button>
-                {store.categories.map((category, index) => (
-                    <button
-                        key={index}
-                        onClick={() => handleCategoryChange(category.name)}
-                        className="btn btn-primary mx-2"
-                    >
-                        {category.name}
-                    </button>
-                ))}
             </div>
+
+            {/* Filtros de categorías, mostrados sólo si `showFilters` es true */}
+            {showFilters && (
+                <div className="my-4">
+                    <button onClick={() => setSelectedCategories([])} className="btn btn-secondary mx-2">
+                        Todas
+                    </button>
+                    {store.categories.map((category, index) => (
+                        <button
+                            key={index}
+                            onClick={() => handleCategoryChange(category.name)}
+                            className={`btn mx-2 ${selectedCategories.includes(category.name) ? "btn-success" : "btn-primary"}`}
+                        >
+                            {category.name}
+                        </button>
+                    ))}
+                </div>
+            )}
 
             {/* Lista de artículos filtrados */}
             <div className="row d-flex flex-nowrap my-5" style={{ overflowX: "scroll" }}>
