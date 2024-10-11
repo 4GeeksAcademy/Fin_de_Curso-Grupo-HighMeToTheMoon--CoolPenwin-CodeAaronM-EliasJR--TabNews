@@ -15,11 +15,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 			token: null,
 			homepageMessage: null,
 			Newspapers: [],
+			userPreferredCategories: [], 
 		},
 		actions: {
 			getHomepage: async () => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/homePage`, {
+					const response = await fetch(`${process.env.BACKEND_URL}api/homePage`, {
 						headers: {
 							Authorization: `Bearer ${localStorage.getItem("token")}`
 						}
@@ -47,7 +48,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			newCategory: async (category) => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/category`, {
+					const response = await fetch(`${process.env.BACKEND_URL}api/category`, {
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
@@ -66,7 +67,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			updateCategory: async (id, updatedData) => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/category/${id}`, {
+					const response = await fetch(`${process.env.BACKEND_URL}api/category/${id}`, {
 						method: "PUT",
 						headers: {
 							"Content-Type": "application/json",
@@ -85,7 +86,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			deleteCategory: async (id) => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/category/${id}`, {
+					const response = await fetch(`${process.env.BACKEND_URL}api/category/${id}`, {
 						method: "DELETE",
 					});
 					if (!response.ok) throw new Error("Failed to delete category");
@@ -98,7 +99,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			
 			getUserCategories: async () => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/user-category`);
+					const response = await fetch(`${process.env.BACKEND_URL}api/user-category`);
 					if (!response.ok) throw new Error("Failed to load user categories");
 			
 					const data = await response.json();
@@ -285,7 +286,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			signup: async (userData) => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/signup`, {
+					const response = await fetch(`${process.env.BACKEND_URL}api/signup`, {
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
@@ -341,7 +342,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			administratorSignup: async (userData) => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/administratorSignup`, {
+					const response = await fetch(`${process.env.BACKEND_URL}api/administratorSignup`, {
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
@@ -386,7 +387,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			getAdministratorHomepage: async () => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/homePage`, {
+					const response = await fetch(`${process.env.BACKEND_URL}api/homePage`, {
 						headers: {
 							Authorization: `Bearer ${localStorage.getItem("token")}`
 						}
@@ -400,6 +401,41 @@ const getState = ({ getStore, getActions, setStore }) => {
 					setStore({ homepageMessage: "Error fetching content" }); 
 				}
 			},
+			getUserPreferredCategories: async () => {
+                const token = localStorage.getItem("token");
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/user-category`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        }
+                    });
+                    if (!response.ok) throw new Error("Failed to load user preferred categories");
+                    const data = await response.json();
+                    setStore({ userPreferredCategories: data });
+                } catch (error) {
+                    console.error("Error loading user preferred categories:", error);
+                }
+            },
+
+			saveUserPreferredCategories: async (selectedCategories) => {
+				const token = localStorage.getItem("token");
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}api/user-category`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${token}`,
+						},
+						body: JSON.stringify({ selectedCategories })
+					});
+					if (!response.ok) throw new Error("Failed to save preferred categories");
+					await getActions().getUserPreferredCategories(); // Refrescar después de guardar
+				} catch (error) {
+					console.error("Error saving preferred categories:", error);
+				}
+			}
+			
+			
 		}
 	};
 };
