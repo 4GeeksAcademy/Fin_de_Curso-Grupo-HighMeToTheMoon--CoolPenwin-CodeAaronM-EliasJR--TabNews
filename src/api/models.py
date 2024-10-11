@@ -118,7 +118,7 @@ class Newspaper(db.Model):
 
 class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(255), nullable=False)
     content = db.Column(db.Text)
     image = db.Column(db.String(255))
     published_date = db.Column(db.String(255))
@@ -126,9 +126,9 @@ class Article(db.Model):
     link = db.Column(db.String(255))
 
     # Claves foráneas para conectar con Author, Newspaper y Category
-    author_id = db.Column(db.Integer, db.ForeignKey('author.id'), nullable=False)
-    newspaper_id = db.Column(db.Integer, db.ForeignKey('newspaper.id'), nullable=False)
-    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('author.id'), nullable=True)
+    newspaper_id = db.Column(db.Integer, db.ForeignKey('newspaper.id'), nullable=True)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
 
     def __repr__(self):
         return f"<Article {self.title}>"

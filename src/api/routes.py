@@ -6,6 +6,7 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, JWTManager
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
+import requests 
 
 
 
@@ -486,6 +487,7 @@ def update_newspaper(newspaper_id):
 #---------------------------------Articles---------------------------
 
 
+
 @api.route('/article', methods=['GET'])
 def get_article():
     all_articles = Article.query.all()
@@ -729,3 +731,48 @@ def administratorLogin():
 @jwt_required()  # Solo los usuarios autenticados pueden acceder a esta vista
 def administratorhomepage():
     return jsonify(message="Bienvenido a la página principal"), 200
+
+@api.route('/getApiArticle', methods=['GET'])
+def get_Api_Article():
+    try:
+        # Hacemos la solicitud a la API externa
+        response = requests.get('https://newsapi.org/v2/top-headlines', params={
+            'country': 'us',
+            'apiKey': '53b4cc2189164a09a77e52459edaa684'  # Asegúrate de que la clave sea válida
+        })
+
+        print("Estado de la respuesta de la API externa:", response.status_code)
+        print("Contenido de la respuesta de la API externa:", response.text)
+
+        # Comprobar si la respuesta fue exitosa
+        if response.status_code != 200:
+            return jsonify({'error': 'Error al obtener datos de la API externa'}), 500
+
+        # Convertimos la respuesta a JSON
+        data = response.json()
+
+
+        for article in data['articles']:
+            if article['title']:
+                new_article = Article(
+                    title=article['title'],
+                    content="a",  
+                    image="a",   
+                    published_date="a",  
+                    source="a",   
+                    link="a",     
+                    author_id=1,  
+                    newspaper_id=1, 
+                    category_id=1   
+                )
+                db.session.add(new_article) 
+
+        db.session.commit()  
+
+    except Exception as e:
+        db.session.rollback()  # Deshacer cambios si hay un error
+        print(f"Error al obtener los artículos: {str(e)}")
+        return jsonify({'error': 'Error al procesar la solicitud: ' + str(e)}), 500
+
+    return jsonify(message="Artículos creados exitosamente"), 201
+

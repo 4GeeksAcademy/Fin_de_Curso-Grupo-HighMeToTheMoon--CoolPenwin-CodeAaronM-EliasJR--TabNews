@@ -16,6 +16,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			homepageMessage: null,
 			Newspapers: [],
 			userPreferredCategories: [], 
+			ArticlesApi: [],
 		},
 		actions: {
 			getHomepage: async () => {
@@ -433,7 +434,23 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("Error saving preferred categories:", error);
 				}
-			}
+			},
+			getArticleApiData: async () => {
+				try {
+					// Realiza la solicitud al backend usando la URL definida en las variables de entorno
+					const response = await fetch(`${process.env.BACKEND_URL}api/getApiArticle`);
+			
+					// Verifica si la respuesta es exitosa (status 200-299)
+					if (!response.ok) {
+						throw new Error("Error en la solicitud: " + response.statusText);
+					}
+			
+					// Llama a otra función para obtener los datos de los artículos
+					getActions().getDataArticle();
+				} catch (error) {
+					console.error("Error al obtener artículos de la API:", error);
+				}
+			},
 			
 			
 		}
