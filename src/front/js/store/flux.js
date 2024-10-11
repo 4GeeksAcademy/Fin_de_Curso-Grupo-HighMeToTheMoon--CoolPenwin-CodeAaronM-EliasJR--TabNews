@@ -15,11 +15,13 @@ const getState = ({ getStore, getActions, setStore }) => {
 			token: null,
 			homepageMessage: null,
 			Newspapers: [],
+			userPreferredCategories: [], 
+			ArticlesApi: [],
 		},
 		actions: {
 			getHomepage: async () => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/homePage`, {
+					const response = await fetch(`${process.env.BACKEND_URL}api/homePage`, {
 						headers: {
 							Authorization: `Bearer ${localStorage.getItem("token")}`
 						}
@@ -47,7 +49,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			newCategory: async (category) => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/category`, {
+					const response = await fetch(`${process.env.BACKEND_URL}api/category`, {
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
@@ -66,7 +68,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			updateCategory: async (id, updatedData) => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/category/${id}`, {
+					const response = await fetch(`${process.env.BACKEND_URL}api/category/${id}`, {
 						method: "PUT",
 						headers: {
 							"Content-Type": "application/json",
@@ -85,7 +87,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			deleteCategory: async (id) => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/category/${id}`, {
+					const response = await fetch(`${process.env.BACKEND_URL}api/category/${id}`, {
 						method: "DELETE",
 					});
 					if (!response.ok) throw new Error("Failed to delete category");
@@ -98,7 +100,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			
 			getUserCategories: async () => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/user-category`);
+					const response = await fetch(`${process.env.BACKEND_URL}api/user-category`);
 					if (!response.ok) throw new Error("Failed to load user categories");
 			
 					const data = await response.json();
@@ -285,7 +287,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			signup: async (userData) => {
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/signup`, {
+					const response = await fetch(`${process.env.BACKEND_URL}api/signup`, {
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json",
@@ -339,6 +341,118 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ temp: props });
 				console.log("ID para editar:", props); 
 			},
+			administratorSignup: async (userData) => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}api/administratorSignup`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(userData),
+					});
+
+					if (!response.ok) {
+						const errorData = await response.json();
+						throw new Error(`Error ${response.status}: ${errorData.message || "Unknown error"}`);
+					}
+
+					const data = await response.json();
+					console.log(data.msg);
+
+				} catch (error) {
+					console.error("Error signing up:", error);
+				}
+			},
+		
+			administratorLogin: async (credentials) => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}api/administratorLogin`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(credentials),
+					});
+
+					if (!response.ok) {
+						const errorData = await response.json();
+						throw new Error(`Error ${response.status}: ${errorData.message || "Unknown error"}`);
+					}
+					const data = await response.json();
+					setStore({ token: data.access_token });
+					localStorage.setItem("token", data.access_token);
+					console.log("Inicio de sesión exitoso, token:", data.access_token);
+					} catch (error) {
+						console.error("Error logging in:", error);
+					}
+			},
+			getAdministratorHomepage: async () => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}api/homePage`, {
+						headers: {
+							Authorization: `Bearer ${localStorage.getItem("token")}`
+						}
+					});
+					if (!response.ok) throw new Error("Failed to load homepage content");					
+					const data = await response.json();
+					setStore({ homepageMessage: data.message }); 
+					console.log(data)
+				} catch (error) {
+					console.error("Error fetching homepage content:", error);
+					setStore({ homepageMessage: "Error fetching content" }); 
+				}
+			},
+			getUserPreferredCategories: async () => {
+                const token = localStorage.getItem("token");
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}api/user-category`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        }
+                    });
+                    if (!response.ok) throw new Error("Failed to load user preferred categories");
+                    const data = await response.json();
+                    setStore({ userPreferredCategories: data });
+                } catch (error) {
+                    console.error("Error loading user preferred categories:", error);
+                }
+            },
+
+			saveUserPreferredCategories: async (selectedCategories) => {
+				const token = localStorage.getItem("token");
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}api/user-category`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${token}`,
+						},
+						body: JSON.stringify({ selectedCategories })
+					});
+					if (!response.ok) throw new Error("Failed to save preferred categories");
+					await getActions().getUserPreferredCategories(); // Refrescar después de guardar
+				} catch (error) {
+					console.error("Error saving preferred categories:", error);
+				}
+			},
+			getArticleApiData: async () => {
+				try {
+					// Realiza la solicitud al backend usando la URL definida en las variables de entorno
+					const response = await fetch(`${process.env.BACKEND_URL}api/getApiArticle`);
+			
+					// Verifica si la respuesta es exitosa (status 200-299)
+					if (!response.ok) {
+						throw new Error("Error en la solicitud: " + response.statusText);
+					}
+			
+					// Llama a otra función para obtener los datos de los artículos
+					getActions().getDataArticle();
+				} catch (error) {
+					console.error("Error al obtener artículos de la API:", error);
+				}
+			},
+			
+			
 		}
 	};
 };

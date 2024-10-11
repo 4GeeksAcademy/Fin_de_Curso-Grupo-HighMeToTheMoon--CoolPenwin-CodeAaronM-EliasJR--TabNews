@@ -1,16 +1,27 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Context } from "../store/appContext";
-import "../../styles/home.css";
+import React, { useEffect, useContext, useState } from "react";
+import { Context } from "../store/appContext"; // Ajusta la ruta según sea necesario
+import { useNavigate } from "react-router-dom";
 import { CardArticle } from "../component/cardArticle";
+import { Link } from "react-router-dom";
 
-export const Home = () => {
-    const { store, actions } = useContext(Context);
-    const [selectedCategories, setSelectedCategories] = useState([]); // Estado para las categorías seleccionadas
+export const AdministratorHomePage = () => {
+    const { store, actions } = useContext(Context); // Obtiene el store y las acciones
+    const navigate = useNavigate();
+    const [selectedCategories, setSelectedCategories] = useState([]); // Estado para categorías seleccionadas
     const [showFilters, setShowFilters] = useState(false); // Estado para mostrar u ocultar los filtros
 
     useEffect(() => {
-        actions.getDataArticle();
-        actions.loadCategories();
+        const token = localStorage.getItem("token"); // Obtén el token de localStorage
+
+        if (!token) {
+            // Si no hay token, redirige a la página de inicio de sesión
+            navigate("/administratorLogin");
+        } else {
+            // Si el token está presente, solicita el contenido de la homepage
+            actions.getAdministratorHomepage();
+            actions.getDataArticle();
+            actions.loadCategories();
+        }
     }, []);
 
     // Función para manejar el cambio de categorías
@@ -30,9 +41,9 @@ export const Home = () => {
         : store.Articles;
 
     return (
-        <div className="text-center mt-5">
-            <h1 className="text-danger">HOMEE</h1>
-            <button className="btn btn-primary" onClick={()=>{actions.getArticleApiData()}}>traer datos de api</button>
+        <div className="container mt-5">
+            <h1 className="text-danger">HOMEE privadoo admin</h1>
+            <button className="btn btn-primary" onClick={actions.getArticleApiData()}>traer datos de api</button>
 
             {/* Botón para mostrar u ocultar los filtros */}
             <div className="my-4">
@@ -76,6 +87,28 @@ export const Home = () => {
                         id={article.id}
                     />
                 ))}
+            </div>
+
+            {/* Navegación a otras páginas */}
+            <div className="ml-auto mb-2">
+                <Link to="/author">
+                    <button className="btn btn-primary">Ver autores</button>
+                </Link>
+            </div>
+            <div className="ml-auto mb-2">
+                <Link to="/newspaper">
+                    <button className="btn btn-primary">Ir a Periódicos</button>
+                </Link>
+            </div>
+            <div className="ml-auto mb-2">
+                <Link to="/category">
+                    <button className="btn btn-primary">Ver Categorías</button>
+                </Link>
+            </div>
+            <div className="ml-auto mb-2">
+                <Link to="/article">
+                    <button className="btn btn-primary">Ir a Artículos</button>
+                </Link>
             </div>
         </div>
     );

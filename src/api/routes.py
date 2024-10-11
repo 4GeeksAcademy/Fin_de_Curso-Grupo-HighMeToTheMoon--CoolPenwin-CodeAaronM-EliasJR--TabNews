@@ -1,11 +1,12 @@
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Category, UserCategory, Author, Newspaper, Article
+from api.models import db, User, Category, UserCategory, Author, Newspaper, Article, Administrator
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import create_access_token, JWTManager
 from flask_jwt_extended import get_jwt_identity
 from flask_jwt_extended import jwt_required
+import requests 
 
 
 
@@ -216,21 +217,38 @@ def get_user_categories_by_user(user_id):
     return jsonify(results), 200
 
 @api.route('/user-category', methods=['POST'])
-def add_user_category():
+@jwt_required()
+def save_user_categories():
+    user_id = get_jwt_identity()
     request_body = request.get_json()
 
-    if "user_id" not in request_body or "category_id" not in request_body:
-        return jsonify({"error": "Datos incompletos, se necesita user_id y category_id"}), 400
+    selected_categories = request_body.get('selectedCategories', [])
+    
+    if not selected_categories:
+        # Si no hay categorías seleccionadas, elimina todas las preferencias del usuario
+        UserCategory.query.filter_by(user_id=user_id).delete()
+        db.session.commit()
+        return jsonify({"msg": "All user categories removed successfully"}), 200
 
-    new_user_category = UserCategory(
-        user_id=request_body["user_id"],
-        category_id=request_body["category_id"]
-    )
+    # Obtén las categorías actuales del usuario
+    current_categories = UserCategory.query.filter_by(user_id=user_id).all()
+    current_category_ids = {cat.category_id for cat in current_categories}
 
-    db.session.add(new_user_category)
+    # Agregar nuevas categorías y eliminar las que ya no están seleccionadas
+    for category_id in selected_categories:
+        if category_id not in current_category_ids:
+            new_user_category = UserCategory(user_id=user_id, category_id=category_id)
+            db.session.add(new_user_category)
+
+    # Eliminar categorías que ya no están seleccionadas
+    for category_id in current_category_ids:
+        if category_id not in selected_categories:
+            UserCategory.query.filter_by(user_id=user_id, category_id=category_id).delete()
+
     db.session.commit()
+    
+    return jsonify({"msg": "User categories updated successfully"}), 200
 
-    return jsonify({"msg": "Relación entre usuario y categoría añadida correctamente"}), 200
 
 @api.route('/user-category/<int:user_category_id>', methods=['DELETE'])
 def delete_user_category(user_category_id):
@@ -469,6 +487,7 @@ def update_newspaper(newspaper_id):
 #---------------------------------Articles---------------------------
 
 
+
 @api.route('/article', methods=['GET'])
 def get_article():
     all_articles = Article.query.all()
@@ -547,3 +566,213 @@ def update_article(article_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+
+#----------------CRUD ADMIN------------
+
+
+@api.route('/administrator', methods=['GET'])
+def get_administrator():
+    administrators = Administrator.query.all()
+    resultados = list(map(lambda item: item.serialize(), administrators))
+
+    if not administrators:
+        return jsonify(message="No se han encontrado usuarios"), 404
+
+    return jsonify(resultados), 200
+
+@api.route('/administrator/<int:administrator_id>', methods=['GET'])
+def get_administrator2(administrator_id):
+    administrator = Administrator.query.get(administrator_id)
+
+    if administrator is None:
+        return jsonify(message="Usuario no encontrado"), 404
+
+    return jsonify(administrator.serialize()), 200
+
+@api.route('/administrator', methods=['POST'])
+def add_new_administrator():
+    request_body_administrator = request.get_json()
+
+    if (
+        "first_name" not in request_body_administrator
+        or "last_name" not in request_body_administrator
+        or "email" not in request_body_administrator
+        or "password" not in request_body_administrator
+    ):
+        return jsonify({"error": "Datos incompletos"}), 400
+
+    existing_administrator = Administrator.query.filter_by(email=request_body_administrator["email"]).first()
+    if existing_administrator:
+        return jsonify({"error": "El correo ya está registrado"}), 400
+
+    hashed_password = bcrypt.generate_password_hash(request_body_administrator["password"]).decode('utf-8')
+
+    new_administrator = Administrator(
+        first_name=request_body_administrator["first_name"],
+        last_name=request_body_administrator["last_name"],
+        email=request_body_administrator["email"],
+        password=hashed_password,
+    )
+
+    try:
+        db.session.add(new_administrator)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+    response_body = {
+        "msg": "Nuevo usuario añadido correctamente"
+    }
+
+    return jsonify(response_body), 201
+
+@api.route('/administrator/<int:administrator_id>', methods=['PUT'])
+def update_administrator(administrator_id):
+    request_body_administrator = request.get_json()
+
+    administrator = Administrator.query.get(administrator_id)
+    
+    if not administrator:
+        return jsonify({'message': "Usuario no encontrado"}), 404
+
+    if "first_name" in request_body_administrator:
+        administrator.first_name = request_body_administrator["first_name"]
+    if "last_name" in request_body_administrator:
+        administrator.last_name = request_body_administrator["last_name"]
+    if "email" in request_body_administrator:
+        existing_administrator = Administrator.query.filter_by(email=request_body_administrator["email"]).first()
+        if existing_administrator and existing_administrator.id != administrator_id:
+            return jsonify({"error": "El correo ya está en uso por otro usuario"}), 400
+        administrator.email = request_body_administrator["email"]
+    if "password" in request_body_administrator:
+        administrator.password = bcrypt.generate_password_hash(request_body_administrator["password"]).decode('utf-8')
+
+    db.session.commit()
+
+    return jsonify({'message': f'Usuario con id {administrator_id} ha sido actualizado correctamente'}), 200
+
+@api.route('/administrator/<int:administrator_id>', methods=['DELETE'])
+def delete_administrator(administrator_id):
+    administrator = Administrator.query.get(administrator_id)
+
+    if not administrator:
+        return jsonify({'message': "Usuario no encontrado"}), 404
+
+    db.session.delete(administrator)
+    db.session.commit()
+
+    return jsonify({'message': f'Usuario con id {administrator_id} ha sido borrado'}), 200
+
+#-----------------ADMIN LOGIN*SIGNUP-------------
+
+
+@api.route('/administratorSignup', methods=['POST'])
+def administratorSignup():
+    request_body_administrator = request.get_json()
+
+    if (
+        "first_name" not in request_body_administrator
+        or "last_name" not in request_body_administrator
+        or "email" not in request_body_administrator
+        or "password" not in request_body_administrator
+    ):
+        return jsonify({"error": "Datos incompletos"}), 400
+
+    existing_administrator = Administrator.query.filter_by(email=request_body_administrator["email"]).first()
+    if existing_administrator:
+        return jsonify({"error": "El correo ya está registrado"}), 400
+
+    hashed_password = bcrypt.generate_password_hash(request_body_administrator["password"]).decode('utf-8')
+
+    new_administrator = Administrator(
+        first_name=request_body_administrator["first_name"],
+        last_name=request_body_administrator["last_name"],
+        email=request_body_administrator["email"],
+        password=hashed_password,
+    )
+
+    try:
+        db.session.add(new_administrator)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+    response_body = {
+        "msg": "Nuevo usuario añadido correctamente"
+    }
+
+    return jsonify(response_body), 201
+
+@api.route('/administratorLogin', methods=['POST'])
+def administratorLogin():
+    # Obtener el cuerpo de la solicitud JSON
+    request_body_administrator = request.get_json()
+
+    if "email" not in request_body_administrator or "password" not in request_body_administrator:
+        return jsonify({"error": "Correo y contraseña son requeridos"}), 400
+
+    # Consultar el usuario en la base de datos usando el correo electrónico
+    administrator = Administrator.query.filter_by(email=request_body_administrator["email"]).first()
+
+    # Verificar que el usuario existe y que la contraseña sea correcta
+    if not administrator or not bcrypt.check_password_hash(administrator.password, request_body_administrator["password"]):
+        return jsonify({"error": "Correo o contraseña incorrectos"}), 401
+
+    # Crear un token de acceso usando el ID del usuario
+    access_token = create_access_token(identity=administrator.id)
+
+    # Retornar el token de acceso
+    return jsonify(access_token=access_token), 200
+
+@api.route('/administratorHomePage', methods=['GET'])
+@jwt_required()  # Solo los usuarios autenticados pueden acceder a esta vista
+def administratorhomepage():
+    return jsonify(message="Bienvenido a la página principal"), 200
+
+@api.route('/getApiArticle', methods=['GET'])
+def get_Api_Article():
+    try:
+        # Hacemos la solicitud a la API externa
+        response = requests.get('https://newsapi.org/v2/top-headlines', params={
+            'country': 'us',
+            'apiKey': '53b4cc2189164a09a77e52459edaa684'  # Asegúrate de que la clave sea válida
+        })
+
+        print("Estado de la respuesta de la API externa:", response.status_code)
+        print("Contenido de la respuesta de la API externa:", response.text)
+
+        # Comprobar si la respuesta fue exitosa
+        if response.status_code != 200:
+            return jsonify({'error': 'Error al obtener datos de la API externa'}), 500
+
+        # Convertimos la respuesta a JSON
+        data = response.json()
+
+
+        for article in data['articles']:
+            if article['title']:
+                new_article = Article(
+                    title=article['title'],
+                    content="a",  
+                    image="a",   
+                    published_date="a",  
+                    source="a",   
+                    link="a",     
+                    author_id=1,  
+                    newspaper_id=1, 
+                    category_id=1   
+                )
+                db.session.add(new_article) 
+
+        db.session.commit()  
+
+    except Exception as e:
+        db.session.rollback()  # Deshacer cambios si hay un error
+        print(f"Error al obtener los artículos: {str(e)}")
+        return jsonify({'error': 'Error al procesar la solicitud: ' + str(e)}), 500
+
+    return jsonify(message="Artículos creados exitosamente"), 201
+
