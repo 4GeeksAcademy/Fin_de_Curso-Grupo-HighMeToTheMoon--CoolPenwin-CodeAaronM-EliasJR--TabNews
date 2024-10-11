@@ -32,6 +32,7 @@ export const Home = () => {
     return (
         <div className="text-center mt-5">
             <h1 className="text-danger">HOMEE</h1>
+            <button className="btn btn-primary" onClick={()=>{actions.getArticleApiData()}}>traer datos de api</button>
 
             {/* Botón para mostrar u ocultar los filtros */}
             <div className="my-4">
