@@ -735,7 +735,6 @@ def administratorhomepage():
 @api.route('/getApiArticle', methods=['GET'])
 def get_Api_Article():
     try:
-        # Hacemos la solicitud a la API externa
         response = requests.get('https://newsapi.org/v2/top-headlines', params={
             'country': 'us',
             'apiKey': '53b4cc2189164a09a77e52459edaa684'  # Asegúrate de que la clave sea válida
@@ -744,35 +743,69 @@ def get_Api_Article():
         print("Estado de la respuesta de la API externa:", response.status_code)
         print("Contenido de la respuesta de la API externa:", response.text)
 
-        # Comprobar si la respuesta fue exitosa
         if response.status_code != 200:
             return jsonify({'error': 'Error al obtener datos de la API externa'}), 500
 
-        # Convertimos la respuesta a JSON
         data = response.json()
 
-
         for article in data['articles']:
-            if article['title']:
-                new_article = Article(
-                    title=article['title'],
-                    content="a",  
-                    image="a",   
-                    published_date="a",  
-                    source="a",   
-                    link="a",     
-                    author_id=1,  
-                    newspaper_id=1, 
-                    category_id=1   
-                )
-                db.session.add(new_article) 
+            title = article.get('title')
+            description = article.get('description')
+            url_to_image = article.get('urlToImage')
+            published_at = article.get('publishedAt')
+            url = article.get('url')
+            
+            author_name = article.get('author') or 'Desconocido'
+            source_name = article.get('source', {}).get('name') or 'Fuente Desconocida'
 
-        db.session.commit()  
+            # Recortar el nombre del autor si es necesario
+            author_name = author_name[:100]  # Asegúrate de no exceder 100 caracteres
+
+            # Evitamos crear artículos sin título, descripción o URL
+            if not title or not description or not url:
+                print(f"Artículo ignorado por falta de datos: {title}, {description}, {url}")
+                continue
+
+            # Verificar si el autor ya existe en la base de datos
+            author = Author.query.filter_by(name=author_name).first()
+            if not author:
+                # Aquí no asignamos valores vacíos, sino que dejamos el campo como NULL
+                author = Author(name=author_name, description=None, photo=None)  
+                db.session.add(author)
+                db.session.flush()  # Guarda el autor temporalmente para obtener su ID
+
+            # Verificar si el periódico ya existe en la base de datos
+            newspaper = Newspaper.query.filter_by(name=source_name).first()
+            if not newspaper:
+                newspaper = Newspaper(name=source_name)
+                db.session.add(newspaper)
+                db.session.flush()  # Guarda el periódico temporalmente para obtener su ID
+
+            # Crear el nuevo artículo
+            new_article = Article(
+                title=title,
+                content=description,
+                image=url_to_image,
+                published_date=published_at,
+                source=url,
+                link=url,
+                author_id=author.id,  # Asociar el ID del autor
+                newspaper_id=newspaper.id,  # Asociar el ID del periódico
+                category_id=1  # Suponiendo que tienes una categoría fija por ahora
+            )
+
+            db.session.add(new_article)
+
+        db.session.commit()  # Confirmar todos los cambios
+        return jsonify(message="Artículos creados exitosamente"), 201
 
     except Exception as e:
-        db.session.rollback()  # Deshacer cambios si hay un error
-        print(f"Error al obtener los artículos: {str(e)}")
+        db.session.rollback()  # Deshacer cambios en caso de error
+        print(f"Error al procesar la solicitud: {str(e)}")
         return jsonify({'error': 'Error al procesar la solicitud: ' + str(e)}), 500
 
-    return jsonify(message="Artículos creados exitosamente"), 201
+
+
+
+
 
