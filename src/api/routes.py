@@ -738,7 +738,7 @@ def get_Api_Article():
         # Hacemos la solicitud a la API externa
         response = requests.get('https://newsapi.org/v2/top-headlines', params={
             'country': 'us',
-            'apiKey': '53b4cc2189164a09a77e52459edaa684'  # Asegúrate de que la clave sea válida
+            'apiKey': '7f63a0e6ff1545ee985b734fad2d06aa'  # Asegúrate de que la clave sea válida
         })
 
         print("Estado de la respuesta de la API externa:", response.status_code)

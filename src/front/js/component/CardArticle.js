@@ -18,25 +18,21 @@ export const CardArticle = (props) => {
       author: props.author,
       newspaper: props.newspaper,
       category: props.category
-    }); 
+    });
   };
- 
+
   return (
     <div className="card m-2" style={{ width: "18rem" }}>
       <img src={rigoImage} className="card-img-top" alt="..." />
       <div className="card-body">
-        {props.showEditButton && (
-          <Link to="/AddArticle">
-            <button type="button" className="btn btn-outline-light text-secondary" onClick={handleEdit}>
-              <i className="fa-solid fa-pencil"></i>
-            </button>
-          </Link>
-        )}
-        {props.showDeleteButton && (
-          <button type="button" className="btn btn-primary" onClick={() => actions.deleteArticle(props.id)}>
-            DELETE
+        <Link to="/AddArticle">
+          <button type="button" className="btn btn-outline-light text-secondary" onClick={handleEdit}>
+            <i className="fa-solid fa-pencil"></i>
           </button>
-        )}
+        </Link>
+        <button type="button" className="btn btn-primary" onClick={() => actions.deleteArticle(props.id)}>
+          DELETE
+        </button>
         <h5 className="card-title">title: {props.title}</h5>
         <p className="card-text m-0">content: {props.content}</p>
         <p className="card-text m-0">image: {props.image}</p>

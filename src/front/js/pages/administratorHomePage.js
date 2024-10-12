@@ -2,6 +2,7 @@ import React, { useEffect, useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 import { CardArticle } from "../component/CardArticle";
+
 export const AdministratorHomePage = () => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate();
@@ -34,7 +35,7 @@ export const AdministratorHomePage = () => {
     return (
         <div className="container mt-5">
             <h1 className="text-danger">HOMEE privadoo admin</h1>
-            <button className="btn btn-primary" onClick={() => actions.getArticleApiData()}>traer datos de api</button>
+            <button className="btn btn-primary" onClick={actions.getArticleApiData}>traer datos de api</button>
 
             <div className="row d-flex flex-nowrap my-5" style={{ overflowX: "scroll" }}>
                 {filteredArticles.map((article, index) => (
@@ -50,8 +51,8 @@ export const AdministratorHomePage = () => {
                         newspaper={article.newspaper}
                         category={article.category}
                         id={article.id}
-                        showEditButton={true} // Asegúrate de que esto esté presente
-                        showDeleteButton={true} // Asegúrate de que esto esté presente
+                        showEditButton={true} // Muestra el botón de editar
+                        showDeleteButton={true} // Muestra el botón de eliminar
                     />
                 ))}
             </div>
