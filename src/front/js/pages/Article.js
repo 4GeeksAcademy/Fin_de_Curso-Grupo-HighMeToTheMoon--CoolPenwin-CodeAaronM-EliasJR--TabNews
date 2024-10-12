@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import "../../styles/home.css";
-import { CardArticle } from "../component/cardArticle";
+import { CardArticle } from "../component/CardArticle";
 import { Link } from "react-router-dom";
 
 export const Article = () => {

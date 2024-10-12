@@ -1,7 +1,7 @@
 import React, { useEffect, useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
-import { CardArticle } from "../component/cardArticle";
+import { CardArticle } from "../component/CardArticle";
 
 export const HomePage = () => {
     const { store, actions } = useContext(Context);

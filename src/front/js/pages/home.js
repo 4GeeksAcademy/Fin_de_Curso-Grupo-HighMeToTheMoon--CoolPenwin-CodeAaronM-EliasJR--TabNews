@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../store/appContext";
 import "../../styles/home.css";
-import { CardArticle } from "../component/cardArticle";
+import { CardArticle } from "../component/CardArticle";
 
 export const Home = () => {
     const { store, actions } = useContext(Context);

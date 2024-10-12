@@ -1,7 +1,6 @@
-import React, {useContext} from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import rigoImage from "../../img/rigo-baby.jpg";
-import "../../styles/home.css";
 import { Context } from "../store/appContext";
 
 export const CardArticle = (props) => {
@@ -23,8 +22,8 @@ export const CardArticle = (props) => {
   };
 
   return (
-    <div className="card m-2" style={{width: "18rem"}}>
-      <img src={rigoImage} className="card-img-top" alt="..."/>showEditButton
+    <div className="card m-2" style={{ width: "18rem" }}>
+      <img src={rigoImage} className="card-img-top" alt="..." />
       <div className="card-body">
         {props.showEditButton && (
           <Link to="/AddArticle">
