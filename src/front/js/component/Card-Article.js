@@ -18,7 +18,7 @@ export const CardArticle = (props) => {
       author: props.author,
       newspaper: props.newspaper,
       category: props.category
-    });
+    }); 
   };
 
   return (
