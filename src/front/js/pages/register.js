@@ -1,7 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Context } from "../store/appContext";  // Importa el contexto global
-import Swal from "sweetalert2";  // Importa SweetAlert2
+import { Context } from "../store/appContext";  // Accede al contexto
 
 const Register = () => {
     const [email, setEmail] = useState("");
@@ -15,7 +14,6 @@ const Register = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        // Construye el objeto con los datos del usuario
         const newUser = {
             first_name: firstName,
             last_name: lastName,
@@ -23,21 +21,9 @@ const Register = () => {
             password: password,
         };
 
-        // Llama a la función signup desde flux
         actions.signup(newUser).then(() => {
-            // Muestra la alerta de éxito centrada cuando se registre correctamente
-            Swal.fire({
-                position: "center",  // Coloca la alerta en el centro de la pantalla
-                icon: "success",
-                title: "¡Usuario registrado correctamente!",
-                showConfirmButton: false,
-                timer: 2000,
-            });
-
-            // Redirige al usuario a la página de inicio de sesión después de 1.5 segundos
-            setTimeout(() => {
-                navigate("/login");
-            }, 1500);
+            // Redirige al usuario a la página de inicio de sesión
+            navigate("/login");
         });
     };
 

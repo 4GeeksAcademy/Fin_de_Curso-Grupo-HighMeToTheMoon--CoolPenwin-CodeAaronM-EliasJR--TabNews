@@ -1,8 +1,9 @@
 import React, { useEffect, useContext, useState } from "react";
 import { Context } from "../store/appContext"; // Ajusta la ruta según sea necesario
 import { useNavigate } from "react-router-dom";
-import { CardArticle } from "../component/cardArticle";
+
 import { Link } from "react-router-dom";
+import { CardArticle } from "../component/CardArticle";
 
 export const AdministratorHomePage = () => {
     const { store, actions } = useContext(Context); // Obtiene el store y las acciones
@@ -85,7 +86,9 @@ export const AdministratorHomePage = () => {
                         newspaper={article.newspaper}
                         category={article.category}
                         id={article.id}
-                    />
+                        showEditButton={true} // Muestra el botón de editar
+                        showDeleteButton={true} // Muestra el botón de eliminar
+                    /> 
                 ))}
             </div>
 
