@@ -20,7 +20,7 @@ export const CardArticle = (props) => {
       category: props.category
     }); 
   };
-
+ 
   return (
     <div className="card m-2" style={{ width: "18rem" }}>
       <img src={rigoImage} className="card-img-top" alt="..." />
