@@ -34,9 +34,9 @@ const AdministratorRegister = () => {
                 timer: 2000,
             });
 
-            // Redirige al usuario a la página de inicio de sesión después de 1.5 segundos
+            // Redirige al usuario a la página principal después de 1.5 segundos
             setTimeout(() => {
-                navigate("/administratorLogin");
+                navigate("/"); // Cambiado a la ruta principal
             }, 1500);
         });
     };
