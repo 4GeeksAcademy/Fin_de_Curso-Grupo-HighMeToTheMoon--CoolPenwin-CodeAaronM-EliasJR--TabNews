@@ -479,6 +479,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 			  
 			
 			
+			  checkAndFetchData: async () => {
+				const actions = getActions();
+				const store = getStore();
+
+				// Cargar las categorías existentes
+				await actions.loadCategories();
+
+				// Verificar si existe la categoría "Uncategorized"
+				const uncategorizedExists = store.categories.some(category => category.name === "Uncategorized");
+
+				if (!uncategorizedExists) {
+					// Crear la categoría "Uncategorized"
+					const newCategory = { name: "Uncategorized", description: "Categoría para artículos sin categoría" };
+					await actions.newCategory(newCategory);
+				}
+
+				// Ahora que estamos seguros de que la categoría existe, traemos los datos de la API
+				await actions.getArticleApiData();
+			},
 		}
 	};
 };

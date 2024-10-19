@@ -9,8 +9,7 @@ export const Home = () => {
     const [showFilters, setShowFilters] = useState(false); // Estado para mostrar u ocultar los filtros
 
     useEffect(() => {
-        actions.getDataArticle();
-        actions.loadCategories();
+        actions.checkAndFetchData();
     }, []);
 
     // Función para manejar el cambio de categorías
