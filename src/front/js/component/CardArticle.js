@@ -1,6 +1,5 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import rigoImage from "../../img/rigo-baby.jpg";
 import { Context } from "../store/appContext";
 
 export const CardArticle = (props) => {
@@ -23,7 +22,7 @@ export const CardArticle = (props) => {
 
   return (
     <div className="card m-2" style={{ width: "18rem" }}>
-      <img src={rigoImage} className="card-img-top" alt="..." />
+      <img src={props.image} className="card-img-top" alt="..." />
       <div className="card-body">
         {props.showEditButton && (
           <Link to="/AddArticle">
@@ -37,16 +36,17 @@ export const CardArticle = (props) => {
             DELETE
           </button>
         )}
-        <h5 className="card-title">title: {props.title}</h5>
-        <p className="card-text m-0">content: {props.content}</p>
-        <p className="card-text m-0">image: {props.image}</p>
-        <p className="card-text m-0">published_date: {props.published_date}</p>
-        <p className="card-text m-0">source: {props.source}</p>
-        <p className="card-text m-0">link: {props.link}</p>
-        <p className="card-text m-0">author: {props.author.name}</p>
-        <p className="card-text m-0">newspaper: {props.newspaper.name}</p>
+        <h5 className="card-title"> {props.title}</h5>
+        <p className="card-text m-0"><b>Fuente</b> {props.newspaper.name}</p>
+        <p className="card-text m-0"><b>author: </b>{props.author.name}</p>
+        <p className="card-text m-0"><b>date </b>{props.published_date}</p>
+        <p className="card-text m-0"><b>content: </b>{props.content}</p>
+        {/* <p className="card-text m-0">image: {props.image}</p> */}
+        {/* <p className="card-text m-0">source: {props.source}</p> */}
+        {/* <p className="card-text m-0">link: {props.link}</p> */}
         <p className="card-text m-0">category: {props.category.name}</p>
         <p className="card-text m-0">id: {props.id}</p>
+        <a href={props.link} target="_blank" rel="noopener noreferrer">ir a la noticia completa</a>
       </div>
     </div>
   );
