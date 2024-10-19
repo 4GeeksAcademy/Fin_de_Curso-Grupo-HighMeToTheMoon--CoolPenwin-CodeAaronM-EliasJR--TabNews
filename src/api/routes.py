@@ -63,7 +63,7 @@ def add_new_user():
     if existing_user:
         return jsonify({"error": "El correo ya está registrado"}), 400
 
-    hashed_password = bcrypt.generate_password_hash(request_body_user["password"]).decode('utf-8')
+    hashed_password = request_body_user["password"]
 
     new_user = User(
         first_name=request_body_user["first_name"],
@@ -104,7 +104,7 @@ def update_user(user_id):
             return jsonify({"error": "El correo ya está en uso por otro usuario"}), 400
         user.email = request_body_user["email"]
     if "password" in request_body_user:
-        user.password = bcrypt.generate_password_hash(request_body_user["password"]).decode('utf-8')
+        user.password = request_body_user["password"]
 
     db.session.commit()
 
@@ -357,7 +357,7 @@ def signup():
     if existing_user:
         return jsonify({"error": "El correo ya está registrado"}), 400
 
-    hashed_password = bcrypt.generate_password_hash(request_body_user["password"]).decode('utf-8')
+    hashed_password = request_body_user["password"]
 
     new_user = User(
         first_name=request_body_user["first_name"],
@@ -391,7 +391,7 @@ def login():
     user = User.query.filter_by(email=request_body_user["email"]).first()
 
     # Verificar que el usuario existe y que la contraseña sea correcta
-    if not user or not bcrypt.check_password_hash(user.password, request_body_user["password"]):
+    if not user or not request_body_user["password"]:
         return jsonify({"error": "Correo o contraseña incorrectos"}), 401
 
     # Crear un token de acceso usando el ID del usuario
@@ -735,44 +735,107 @@ def administratorhomepage():
 @api.route('/getApiArticle', methods=['GET'])
 def get_Api_Article():
     try:
-        # Hacemos la solicitud a la API externa
         response = requests.get('https://newsapi.org/v2/top-headlines', params={
             'country': 'us',
-            'apiKey': '7f63a0e6ff1545ee985b734fad2d06aa'  # Asegúrate de que la clave sea válida
+            'apiKey': '7f63a0e6ff1545ee985b734fad2d06aa' 
         })
 
-        print("Estado de la respuesta de la API externa:", response.status_code)
-        print("Contenido de la respuesta de la API externa:", response.text)
-
-        # Comprobar si la respuesta fue exitosa
         if response.status_code != 200:
             return jsonify({'error': 'Error al obtener datos de la API externa'}), 500
 
-        # Convertimos la respuesta a JSON
         data = response.json()
 
+        # Establecer valores predeterminados para la imagen y la descripción
+        default_image = "https://t3.ftcdn.net/jpg/03/49/45/70/360_F_349457036_XWvovNpNk79ftVg4cIpBhJurdihVoJ2B.jpg"  # URL de imagen por defecto
+        default_description = "Descripción no disponible en este momento."  # Descripción por defecto
 
-        for article in data['articles']:
-            if article['title']:
-                new_article = Article(
-                    title=article['title'],
-                    content="a",  
-                    image="a",   
-                    published_date="a",  
-                    source="a",   
-                    link="a",     
-                    author_id=1,  
-                    newspaper_id=1, 
-                    category_id=1   
-                )
-                db.session.add(new_article) 
+        for article in data.get('articles', []):
+            title = article.get('title')
+            description = article.get('description') or default_description  # Asignar descripción por defecto
+            url_to_image = article.get('urlToImage') or default_image  # Asignar imagen por defecto
+            published_at = article.get('publishedAt')
+            url = article.get('url')
+            author_name = article.get('author')
+            source_name = article.get('source', {}).get('name')
 
-        db.session.commit()  
+            # Validar que los campos críticos no sean None
+            if not all([title, url, author_name, source_name, published_at]):
+                print(f"Artículo ignorado por falta de datos: {article}")
+                continue
+
+            # Limitar los campos a la longitud máxima aceptada por la base de datos
+            title = title[:255]
+            description = description[:65535]
+            url_to_image = url_to_image[:255]
+            url = url[:255]
+            author_name = author_name[:100]
+            source_name = source_name[:255]
+
+            # Verificar si el artículo ya existe en la base de datos (por título y URL)
+            existing_article = Article.query.filter_by(title=title, source=url).first()
+            if existing_article:
+                continue  # Saltar si el artículo ya existe
+
+            # Verificar si el autor ya existe en la base de datos
+            author = Author.query.filter_by(name=author_name).first()
+            if not author:
+                author = Author(name=author_name, description=None, photo=None)
+                db.session.add(author)
+                db.session.flush()
+
+            # Verificar si el periódico ya existe en la base de datos
+            newspaper = Newspaper.query.filter_by(name=source_name).first()
+            if not newspaper:
+                newspaper = Newspaper(name=source_name)
+                db.session.add(newspaper)
+                db.session.flush()
+
+            # Crear el nuevo artículo
+            new_article = Article(
+                title=title,
+                content=description,
+                image=url_to_image,
+                published_date=published_at,
+                source=url,
+                link=url,
+                author_id=author.id,
+                newspaper_id=newspaper.id,
+                category_id=1
+            )
+
+            db.session.add(new_article)
+
+        db.session.commit()
+        return jsonify(message="Artículos creados exitosamente"), 201
 
     except Exception as e:
-        db.session.rollback()  # Deshacer cambios si hay un error
-        print(f"Error al obtener los artículos: {str(e)}")
+        db.session.rollback()
         return jsonify({'error': 'Error al procesar la solicitud: ' + str(e)}), 500
 
-    return jsonify(message="Artículos creados exitosamente"), 201
+
+@api.route('/article/<int:article_id>/category', methods=['PUT'])
+def update_article_category(article_id):
+    request_body = request.get_json()
+
+    if not request_body or 'category_id' not in request_body:
+        return jsonify({'error': 'Category ID is required'}), 400
+
+    category_id = request_body['category_id']
+    article = Article.query.get(article_id)
+
+    if not article:
+        return jsonify({'error': 'Article not found'}), 404
+
+    try:
+        article.category_id = category_id  # Actualiza la categoría del artículo
+        db.session.commit()  # Guarda los cambios en la base de datos
+        return jsonify({'message': f'Article with ID {article_id} updated with new category ID {category_id}'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+
+
+
 

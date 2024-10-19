@@ -390,18 +390,24 @@ const getState = ({ getStore, getActions, setStore }) => {
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}api/homePage`, {
 						headers: {
-							Authorization: `Bearer ${localStorage.getItem("token")}`
+							Authorization: `Bearer ${localStorage.getItem("token")}` // Corrige la interpolación de cadena
 						}
 					});
-					if (!response.ok) throw new Error("Failed to load homepage content");					
+			
+					if (!response.ok) {
+						const errorData = await response.json(); // Intenta obtener datos de error
+						throw new Error(`Error ${response.status}: ${errorData.message || "Failed to load homepage content"}`);
+					}
+			
 					const data = await response.json();
-					setStore({ homepageMessage: data.message }); 
-					console.log(data)
+					setStore({ homepageMessage: data.message });
+					console.log(data);
 				} catch (error) {
 					console.error("Error fetching homepage content:", error);
-					setStore({ homepageMessage: "Error fetching content" }); 
+					setStore({ homepageMessage: "Error fetching content" });
 				}
 			},
+			
 			getUserPreferredCategories: async () => {
                 const token = localStorage.getItem("token");
                 try {
@@ -451,6 +457,26 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("Error al obtener artículos de la API:", error);
 				}
 			},
+			
+			updateArticleCategory: async (id, categoryId) => {
+				try {
+				  const response = await fetch(`${process.env.BACKEND_URL}api/article/${id}/category`, {
+					method: "PUT",
+					headers: {
+					  "Content-Type": "application/json",
+					},
+					body: JSON.stringify({ category_id: categoryId }), // Envía la ID de la nueva categoría
+				  });
+				  if (!response.ok) {
+					const errorData = await response.json();
+					throw new Error(`Error ${response.status}: ${errorData.message || "Unknown error"}`);
+				  }
+				  await	getActions().getDataArticle();// Vuelve a cargar los artículos después de la actualización
+				} catch (error) {
+				  console.error("Error updating article category:", error);
+				}
+			  },
+			  
 			
 			
 		}
