@@ -74,6 +74,8 @@ export const Home = () => {
                         newspaper={article.newspaper}
                         category={article.category}
                         id={article.id}
+                        showEditButton={false} // Muestra el botón de editar
+                        showDeleteButton={false}
                     />
                 ))}
             </div>
