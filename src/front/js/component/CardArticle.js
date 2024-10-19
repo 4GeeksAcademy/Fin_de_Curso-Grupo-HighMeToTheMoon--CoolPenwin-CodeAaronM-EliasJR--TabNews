@@ -40,6 +40,7 @@ export const CardArticle = (props) => {
         <p className="card-text m-0"><b>Fuente</b> {props.newspaper.name}</p>
         <p className="card-text m-0"><b>Published on  </b>{props.published_date}</p>
         <p className="card-text m-0"><b>Writed by </b>{props.author.name}</p>
+        <p> </p>
         <p className="card-text m-0"><b> {props.content}</b></p>
         {/* <p className="card-text m-0">image: {props.image}</p> */}
         {/* <p className="card-text m-0">source: {props.source}</p> */}
