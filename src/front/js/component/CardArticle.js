@@ -38,9 +38,9 @@ export const CardArticle = (props) => {
         )}
         <h5 className="card-title"> {props.title}</h5>
         <p className="card-text m-0"><b>Fuente</b> {props.newspaper.name}</p>
-        <p className="card-text m-0"><b>author: </b>{props.author.name}</p>
-        <p className="card-text m-0"><b>date </b>{props.published_date}</p>
-        <p className="card-text m-0"><b>content: </b>{props.content}</p>
+        <p className="card-text m-0"><b>Published on  </b>{props.published_date}</p>
+        <p className="card-text m-0"><b>Writed by </b>{props.author.name}</p>
+        <p className="card-text m-0"><b> {props.content}</b></p>
         {/* <p className="card-text m-0">image: {props.image}</p> */}
         {/* <p className="card-text m-0">source: {props.source}</p> */}
         {/* <p className="card-text m-0">link: {props.link}</p> */}
