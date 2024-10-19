@@ -87,7 +87,7 @@ export const AddAuthor = () => {
 				</button>
 			</form>
 
-			<Link to="/">
+			<Link to="/administratorHomePage">
 				<h2>Get back to home</h2>
 			</Link>
 

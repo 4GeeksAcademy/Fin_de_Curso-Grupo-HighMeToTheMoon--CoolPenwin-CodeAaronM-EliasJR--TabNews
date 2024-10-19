@@ -1,8 +1,9 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Context } from "../store/appContext";  // Accede al contexto
+import { Context } from "../store/appContext";  // Importa el contexto global
+import Swal from "sweetalert2";  // Importa SweetAlert2
 
-const Register = () => {
+const AdministratorRegister = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [firstName, setFirstName] = useState("");
@@ -14,6 +15,7 @@ const Register = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         
+        // Construye el objeto con los datos del usuario
         const newUser = {
             first_name: firstName,
             last_name: lastName,
@@ -21,15 +23,27 @@ const Register = () => {
             password: password,
         };
 
-        actions.signup(newUser).then(() => {
-            // Redirige al usuario a la página de inicio de sesión
-            navigate("/login");
+        // Llama a la función signup desde flux
+        actions.administratorSignup(newUser).then(() => {
+            // Muestra la alerta de éxito centrada cuando se registre correctamente
+            Swal.fire({
+                position: "center",  // Coloca la alerta en el centro de la pantalla
+                icon: "success",
+                title: "¡Administrador registrado correctamente!",
+                showConfirmButton: false,
+                timer: 2000,
+            });
+
+            // Redirige al usuario a la página principal después de 1.5 segundos
+            setTimeout(() => {
+                navigate("/"); // Cambiado a la ruta principal
+            }, 1500);
         });
     };
 
     return (
         <div className="container mt-5">
-            <h2 className="text-center">Registrarse</h2>
+            <h2 className="text-center">Registrarse como admin</h2>
             <form onSubmit={handleSubmit} className="mt-4">
                 <div className="mb-3">
                     <label htmlFor="firstName" className="form-label">Nombre</label>
@@ -79,10 +93,10 @@ const Register = () => {
             </form>
             <p className="mt-3 text-center">
                 ¿Ya tienes una cuenta?{" "}
-                <Link to="/login">Inicia sesión aquí</Link>
+                <Link to="/administratorLogin">Inicia sesión aquí</Link>
             </p>
         </div>
     );
 };
 
-export default Register;
+export default AdministratorRegister;
