@@ -2,6 +2,7 @@ import React, { useEffect, useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import { useNavigate } from "react-router-dom";
 import { CardArticle } from "../component/CardArticle";
+import { Link } from "react-router-dom";
 
 export const AdministratorHomePage = () => {
     const { store, actions } = useContext(Context);
@@ -36,6 +37,24 @@ export const AdministratorHomePage = () => {
         <div className="container mt-5">
             <h1 className="text-danger">HOMEE privadoo admin</h1>
             <button className="btn btn-primary" onClick={actions.getArticleApiData}>traer datos de api</button>
+            <h4>Crear elementos</h4>
+            <div className="ml-auto mb-2">
+				<Link to="/AddAuthor">
+					<button className="btn btn-primary">Autores</button>
+				</Link>
+			
+				<Link to="/AddNewspaper">
+					<button className="btn btn-primary">Periodicos</button>
+				</Link>
+			
+				<Link to="/add-category">
+					<button className="btn btn-primary">Categorías</button>
+				</Link>
+			
+				<Link to="/AddArticle">
+					<button className="btn btn-primary">Articulos</button>
+				</Link>
+			</div>
 
             <div className="row d-flex flex-nowrap my-5" style={{ overflowX: "scroll" }}>
                 {filteredArticles.map((article, index) => (
