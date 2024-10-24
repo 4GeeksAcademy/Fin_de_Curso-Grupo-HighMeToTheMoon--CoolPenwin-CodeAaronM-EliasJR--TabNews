@@ -28,22 +28,27 @@ export const Home = () => {
         ? store.Articles.filter((article) => selectedCategories.includes(article.category.name))
         : store.Articles;
 
-    return (
-        <div className="text-center mt-5">
-            <h1 className="text-danger">HOMEE</h1>
-            <button className="btn btn-primary" onClick={()=>{actions.getArticleApiData()}}>traer datos de api</button>
-
-            {/* Botón para mostrar u ocultar los filtros */}
-            <div className="my-4">
-                <button onClick={() => setShowFilters(!showFilters)} className="btn btn-info">
+        return (
+            <div className="container">  
+            <div className="d-flex justify-content-between align-items-center mt-4">
+                <h1 className="text-danger ms-2" style={{ fontSize: '2rem', fontWeight: 'bold' }}>HOME</h1>
+        
+                {/* Botón para mostrar u ocultar los filtros */}
+                <button
+                    onClick={() => setShowFilters(!showFilters)}
+                    className="btn btn-info"
+                >
                     {showFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
                 </button>
             </div>
-
+        
             {/* Filtros de categorías, mostrados sólo si `showFilters` es true */}
             {showFilters && (
                 <div className="my-4">
-                    <button onClick={() => setSelectedCategories([])} className="btn btn-secondary mx-2">
+                    <button
+                        onClick={() => setSelectedCategories([])}
+                        className="btn btn-secondary mx-2"
+                    >
                         Todas
                     </button>
                     {store.categories.map((category, index) => (
@@ -57,27 +62,53 @@ export const Home = () => {
                     ))}
                 </div>
             )}
-
-            {/* Lista de artículos filtrados */}
-            <div className="row d-flex flex-nowrap my-5" style={{ overflowX: "scroll" }}>
+        
+        <div className="container-fluid">
+        <div className="row">
+            <div className="d-flex flex-wrap mt-2">
                 {filteredArticles.map((article, index) => (
-                    <CardArticle
-                        key={index}
-                        title={article.title}
-                        content={article.content}
-                        image={article.image}
-                        published_date={article.published_date}
-                        source={article.source}
-                        link={article.link}
-                        author={article.author}
-                        newspaper={article.newspaper}
-                        category={article.category}
-                        id={article.id}
-                        showEditButton={false} // Muestra el botón de editar
-                        showDeleteButton={false}
-                    />
+                    <div 
+                        key={index} 
+                        className="col-12 col-sm-6 col-md-4 col-lg-3" 
+                        style={{ padding: "10px" }}
+                    >
+                        <div className="card h-100">
+                            <img 
+                                src={article.image} 
+                                className="card-img-top" 
+                                alt={article.title} 
+                                style={{ height: "200px", objectFit: "cover" }} 
+                            />
+                            <div className="card-body">
+                                <h5 className="card-title" style={{ fontSize: "1.2rem" }}>
+                                    {article.title}
+                                </h5>
+                                <p className="card-text" style={{ fontSize: "0.9rem" }}>
+                                    {article.content}
+                                </p>
+                                <p className="card-text">
+                                    <small className="text-muted">{article.published_date}</small>
+                                </p>
+                            </div>
+                            <div className="card-footer text-center">
+                                <a 
+                                    href={article.link} 
+                                    className="btn btn-primary"
+                                    style={{ padding: "8px 15px", borderRadius: "5px", transition: "background-color 0.3s, color 0.3s" }}
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                >
+                                    Leer más
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 ))}
             </div>
         </div>
-    );
+    </div>
+    
+        </div>
+        
+        );
 };

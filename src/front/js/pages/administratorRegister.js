@@ -36,66 +36,118 @@ const AdministratorRegister = () => {
 
             // Redirige al usuario a la página principal después de 1.5 segundos
             setTimeout(() => {
-                navigate("/"); // Cambiado a la ruta principal
+                navigate("/AdministratorLogin"); // Cambiado a la ruta principal
             }, 1500);
         });
     };
 
     return (
-        <div className="container mt-5">
-            <h2 className="text-center">Registrarse como admin</h2>
+        <div
+        className="container-fluid"
+        style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '100vh', // Asegura que cubra toda la altura de la pantalla
+            width: '100vw', // Asegura que cubra todo el ancho
+            margin: 0, // Elimina cualquier margen externo
+            padding: 0,
+            backgroundColor: '#e0e0e0', // Color de fondo gris
+            fontFamily: 'Arial, sans-serif',
+        }}
+    >
+        <div
+            style={{
+                backgroundColor: '#f5f5f5',
+                width: '600px', // Aumenta el ancho
+                padding: '40px', // Padding más amplio
+                borderRadius: '20px', // Bordes redondeados
+                boxShadow: '0px 10px 15px rgba(0, 0, 0, 0.1)', // Sombra más suave
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '30px',
+                margin: '20px 0', // Agrega margen superior e inferior
+            }}
+        >
+            <h2 className="text-center" style={{ margin: 0, fontWeight: 'normal', color: '#333' }}>
+                Registrarse como Admin
+            </h2>
             <form onSubmit={handleSubmit} className="mt-4">
-                <div className="mb-3">
-                    <label htmlFor="firstName" className="form-label">Nombre</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="firstName"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="lastName" className="form-label">Apellido</label>
-                    <input
-                        type="text"
-                        className="form-control"
-                        id="lastName"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="email" className="form-label">Correo Electrónico</label>
-                    <input
-                        type="email"
-                        className="form-control"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                </div>
-                <div className="mb-3">
-                    <label htmlFor="password" className="form-label">Contraseña</label>
-                    <input
-                        type="password"
-                        className="form-control"
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </div>
-                <button type="submit" className="btn btn-primary">Registrarse</button>
+                {['firstName', 'lastName', 'email', 'password'].map((field) => (
+                    <div
+                        key={field}
+                        className="mb-3"
+                        style={{
+                            width: '100%',
+                            borderRadius: '25px',
+                            padding: '10px',
+                            backgroundColor: '#eaeaea', 
+                            boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.1)',
+                            transition: 'transform 0.2s',
+                        }}
+                    >
+                        <label htmlFor={field} className="form-label" style={{ fontWeight: '600', color: '#555' }}>
+                            {field === 'firstName' ? 'Nombre' : field === 'lastName' ? 'Apellido' : field === 'email' ? 'Correo Electrónico' : 'Contraseña'}
+                        </label>
+                        <input
+                            type={field === 'email' ? 'email' : field === 'password' ? 'password' : 'text'}
+                            className="form-control"
+                            id={field}
+                            value={field === 'firstName' ? firstName : field === 'lastName' ? lastName : field === 'email' ? email : password}
+                            onChange={(e) => {
+                                if (field === 'firstName') setFirstName(e.target.value);
+                                else if (field === 'lastName') setLastName(e.target.value);
+                                else if (field === 'email') setEmail(e.target.value);
+                                else if (field === 'password') setPassword(e.target.value);
+                            }}
+                            required
+                            style={{
+                                border: 'none',
+                                borderRadius: '5px', 
+                                padding: '10px 0', 
+                                backgroundColor: '#fff', 
+                                outline: 'none', 
+                            }}
+                            onFocus={(e) => {
+                                e.target.style.boxShadow = 'none'; 
+                            }}
+                        />
+                    </div>
+                ))}
+                <button
+                    type="submit"
+                    className="btn btn-primary"
+                    style={{
+                        width: '100%',
+                        padding: '15px',
+                        borderRadius: '25px', 
+                        backgroundColor: '#f39c12',
+                        color: 'white',
+                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+                        transition: 'transform 0.2s, box-shadow 0.2s, background-color 0.3s',
+                        border: 'none',
+                        fontSize: '18px',
+                    }}
+                    onMouseOver={(e) => {
+                        e.target.style.transform = 'translateY(-3px)';
+                        e.target.style.boxShadow = '0 8px 15px rgba(0, 0, 0, 0.3)';
+                    }}
+                    onMouseOut={(e) => {
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+                    }}
+                >
+                    Registrarse
+                </button>
             </form>
-            <p className="mt-3 text-center">
-                ¿Ya tienes una cuenta?{" "}
-                <Link to="/administratorLogin">Inicia sesión aquí</Link>
+            <p className="mt-3 text-center" style={{ fontSize: '16px', color: '#777' }}>
+                ¿Ya tienes una cuenta?{' '}
+                <Link to="/administratorLogin" style={{ color: '#f39c12', textDecoration: 'underline' }}>
+                    Inicia sesión aquí
+                </Link>
             </p>
         </div>
+    </div>    
     );
 };
 
