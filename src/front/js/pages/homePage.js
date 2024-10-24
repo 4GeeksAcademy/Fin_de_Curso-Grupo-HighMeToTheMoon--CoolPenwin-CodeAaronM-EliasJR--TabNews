@@ -51,88 +51,87 @@ export const HomePage = () => {
         : store.Articles;
 
     return (
-        <div className="container mt-5">
-            <h1 className="text-danger">HomePage</h1>
-
-            <div className="my-4">
-                <button onClick={() => setShowFilters(!showFilters)} className="btn btn-info">
-                    {showFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
-                </button>
-
-                <button onClick={() => setShowPreferences(!showPreferences)} className="btn btn-warning mx-2">
-                    {showPreferences ? "Ocultar Preferencias" : "Seleccionar Preferencias"}
-                </button>
-            </div>
-
-            {showFilters && (
-                <div className="my-4">
-                    <button onClick={() => setSelectedCategories([])} className="btn btn-secondary mx-2">
-                        Todas
-                    </button>
-                    {store.categories.map((category, index) => (
-                        <button
-                            key={index}
-                            onClick={() => handleCategoryChange(category.id)}
-                            className={`btn mx-2 ${selectedCategories.includes(category.id) ? "btn-success" : "btn-primary"}`}
-                        >
-                            {category.name}
-                        </button>
-                    ))}
-                </div>
-            )}
-
-            {showPreferences && (
-                <div className="preferences-modal">
-                    <h3>Selecciona tus categorías preferidas</h3>
-                    {store.categories.map((category, index) => (
-                        <div key={index} className="form-check">
-                            <input
-                                type="checkbox"
-                                className="form-check-input"
-                                id={`category-${category.id}`}
-                                checked={selectedCategories.includes(category.id)}
-                                onChange={() => handleCategoryChange(category.id)}
-                            />
-                            <label className="form-check-label" htmlFor={`category-${category.id}`}>
-                                {category.name}
-                            </label>
-                        </div>
-                    ))}
-                    <button className="btn btn-primary mt-3" onClick={savePreferences}>
-                        Guardar Preferencias
-                    </button>
-                </div>
-            )}
-
-            <div className="row d-flex flex-nowrap my-5" style={{ overflowX: "scroll" }}>
-                {filteredArticles.length > 0 ? (
-                    filteredArticles.map((article, index) => (
-                        <CardArticle
-                            key={index}
-                            title={article.title}
-                            content={article.content}
-                            image={article.image}
-                            published_date={article.published_date}
-                            source={article.source}
-                            link={article.link}
-                            author={article.author}
-                            newspaper={article.newspaper}
-                            category={article.category}
-                            id={article.id}
-                            showEditButton={false} // Muestra el botón de editar
-                            showDeleteButton={false}
-                        />
-                    ))
-                ) : (
-                    <p>No se encontraron artículos para las categorías seleccionadas.</p>
-                )}
-            </div>
-
-            {store.homepageMessage ? (
-                <p className="mt-4">{store.homepageMessage}</p>
-            ) : (
-                <p>Cargando...</p>
-            )}
+        
+        <div className="container">  
+        <div className="d-flex justify-content-between align-items-center mt-4">
+            <h1 className="text-danger ms-2" style={{ fontSize: '2rem', fontWeight: 'bold' }}>HOME</h1>
+    
+            {/* Botón para mostrar u ocultar los filtros */}
+            <button
+                onClick={() => setShowFilters(!showFilters)}
+                className="btn btn-info"
+            >
+                {showFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
+            </button>
         </div>
+    
+        {/* Filtros de categorías, mostrados sólo si `showFilters` es true */}
+        {showFilters && (
+            <div className="my-4">
+                <button
+                    onClick={() => setSelectedCategories([])}
+                    className="btn btn-secondary mx-2"
+                >
+                    Todas
+                </button>
+                {store.categories.map((category, index) => (
+                    <button
+                        key={index}
+                        onClick={() => handleCategoryChange(category.name)}
+                        className={`btn mx-2 ${selectedCategories.includes(category.name) ? "btn-success" : "btn-primary"}`}
+                    >
+                        {category.name}
+                    </button>
+                ))}
+            </div>
+        )}
+    
+    <div className="container-fluid">
+    <div className="row">
+        <div className="d-flex flex-wrap mt-2">
+            {filteredArticles.map((article, index) => (
+                <div 
+                    key={index} 
+                    className="col-12 col-sm-6 col-md-4 col-lg-3" 
+                    style={{ padding: "10px" }}
+                >
+                    <div className="card h-100">
+                        <img 
+                            src={article.image} 
+                            className="card-img-top" 
+                            alt={article.title} 
+                            style={{ height: "200px", objectFit: "cover" }} 
+                        />
+                        <div className="card-body">
+                            <h5 className="card-title" style={{ fontSize: "1.2rem" }}>
+                                {article.title}
+                            </h5>
+                            <p className="card-text" style={{ fontSize: "0.9rem" }}>
+                                {article.content}
+                            </p>
+                            <p className="card-text">
+                                <small className="text-muted">{article.published_date}</small>
+                            </p>
+                        </div>
+                        <div className="card-footer text-center">
+                            <a 
+                                href={article.link} 
+                                className="btn btn-primary"
+                                style={{ padding: "8px 15px", borderRadius: "5px", transition: "background-color 0.3s, color 0.3s" }}
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                            >
+                                Leer más
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+</div>
+
+    </div>
+    
     );
 };
