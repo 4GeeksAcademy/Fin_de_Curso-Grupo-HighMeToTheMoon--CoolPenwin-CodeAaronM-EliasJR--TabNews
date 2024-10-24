@@ -1,7 +1,7 @@
 import React, { useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import "../../styles/home.css";
-import { CardArticle } from "../component/cardArticle";
+import { CardArticle } from "../component/CardArticle";
 import { Link } from "react-router-dom";
 
 export const Article = () => {
@@ -16,7 +16,7 @@ export const Article = () => {
 			<h1>Hello Rigo!!</h1>
 			<h1 className="text-danger">Articles</h1>
 			
-			<Link to="/">
+			<Link to="/administratorHomePage">
 				<h2>Get back to home</h2>
 			</Link>
 			

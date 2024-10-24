@@ -1,7 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Context } from "../store/appContext";  // Importa el contexto global
-import Swal from "sweetalert2";  // Importa SweetAlert2
+import { Context } from "../store/appContext";  // Accede al contexto
 
 const Register = () => {
     const [email, setEmail] = useState("");
@@ -15,7 +14,6 @@ const Register = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         
-        // Construye el objeto con los datos del usuario
         const newUser = {
             first_name: firstName,
             last_name: lastName,
@@ -23,30 +21,42 @@ const Register = () => {
             password: password,
         };
 
-        // Llama a la función signup desde flux
         actions.signup(newUser).then(() => {
-            // Muestra la alerta de éxito centrada cuando se registre correctamente
-            Swal.fire({
-                position: "center",  // Coloca la alerta en el centro de la pantalla
-                icon: "success",
-                title: "¡Usuario registrado correctamente!",
-                showConfirmButton: false,
-                timer: 2000,
-            });
-
-            // Redirige al usuario a la página de inicio de sesión después de 1.5 segundos
-            setTimeout(() => {
-                navigate("/login");
-            }, 1500);
+            // Redirige al usuario a la página de inicio de sesión
+            navigate("/login");
         });
     };
 
     return (
-        <div className="container mt-5">
-            <h2 className="text-center">Registrarse</h2>
+        <div
+        className="container mt-5"
+        style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '100vh',
+            backgroundColor: '#a0d9c9',
+            padding: '40px',
+            marginBottom: '62px',
+        }}
+    >
+        <div
+            style={{
+                backgroundColor: '#fff',
+                borderRadius: '20px',
+                padding: '30px',
+                width: '500px', // Ancho mayor que el de inicio de sesión
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+            }}
+        >
+            <h2 className="text-center" style={{ margin: '0 0 20px', fontWeight: 'bold', color: '#333' }}>
+                Registrarse
+            </h2>
             <form onSubmit={handleSubmit} className="mt-4">
                 <div className="mb-3">
-                    <label htmlFor="firstName" className="form-label">Nombre</label>
+                    <label htmlFor="firstName" className="form-label" style={{ fontWeight: '600', color: '#555' }}>
+                        Nombre
+                    </label>
                     <input
                         type="text"
                         className="form-control"
@@ -54,10 +64,20 @@ const Register = () => {
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         required
+                        style={{
+                            border: 'none',
+                            borderBottom: '2px solid #f39c12',
+                            padding: '10px 0',
+                            fontSize: '16px',
+                            backgroundColor: '#fff',
+                            outline: 'none',
+                        }}
                     />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="lastName" className="form-label">Apellido</label>
+                    <label htmlFor="lastName" className="form-label" style={{ fontWeight: '600', color: '#555' }}>
+                        Apellido
+                    </label>
                     <input
                         type="text"
                         className="form-control"
@@ -65,10 +85,20 @@ const Register = () => {
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         required
+                        style={{
+                            border: 'none',
+                            borderBottom: '2px solid #f39c12',
+                            padding: '10px 0',
+                            fontSize: '16px',
+                            backgroundColor: '#fff',
+                            outline: 'none',
+                        }}
                     />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="email" className="form-label">Correo Electrónico</label>
+                    <label htmlFor="email" className="form-label" style={{ fontWeight: '600', color: '#555' }}>
+                        Correo Electrónico
+                    </label>
                     <input
                         type="email"
                         className="form-control"
@@ -76,10 +106,20 @@ const Register = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        style={{
+                            border: 'none',
+                            borderBottom: '2px solid #f39c12',
+                            padding: '10px 0',
+                            fontSize: '16px',
+                            backgroundColor: '#fff',
+                            outline: 'none',
+                        }}
                     />
                 </div>
                 <div className="mb-3">
-                    <label htmlFor="password" className="form-label">Contraseña</label>
+                    <label htmlFor="password" className="form-label" style={{ fontWeight: '600', color: '#555' }}>
+                        Contraseña
+                    </label>
                     <input
                         type="password"
                         className="form-control"
@@ -87,15 +127,40 @@ const Register = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        style={{
+                            border: 'none',
+                            borderBottom: '2px solid #f39c12',
+                            padding: '10px 0',
+                            fontSize: '16px',
+                            backgroundColor: '#fff',
+                            outline: 'none',
+                        }}
                     />
                 </div>
-                <button type="submit" className="btn btn-primary">Registrarse</button>
+                <button
+                    type="submit"
+                    className="btn btn-primary"
+                    style={{
+                        width: '100%',
+                        padding: '15px',
+                        borderRadius: '30px',
+                        backgroundColor: '#f39c12',
+                        color: 'white',
+                        border: 'none',
+                        transition: 'background-color 0.3s, transform 0.2s',
+                    }}
+                >
+                    Registrarse
+                </button>
             </form>
-            <p className="mt-3 text-center">
+            <p className="mt-3 text-center" style={{ fontSize: '16px', color: '#777' }}>
                 ¿Ya tienes una cuenta?{" "}
-                <Link to="/login">Inicia sesión aquí</Link>
+                <Link to="/login" style={{ color: '#f39c12', textDecoration: 'underline' }}>
+                    Inicia sesión aquí
+                </Link>
             </p>
         </div>
+    </div>    
     );
 };
 

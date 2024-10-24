@@ -15,7 +15,7 @@ export const Author = () => {
 		<div className="text-center mt-5">
 			<h1>Hello Rigo!!</h1>
 			<h1 className="text-danger">Authors</h1>
-            <Link to="/">
+            <Link to="/administratorHomePage">
 						<h2>get back to home</h2>
 					</Link>
 			<Link to="/AddAuthor">

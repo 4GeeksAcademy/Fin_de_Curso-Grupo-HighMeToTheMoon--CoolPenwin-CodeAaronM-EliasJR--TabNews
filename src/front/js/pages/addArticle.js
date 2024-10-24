@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { Context } from "../store/appContext";
 import "../../styles/home.css";
 import { Link } from "react-router-dom";
-import { CardArticle } from "../component/cardArticle";
+import { CardArticle } from "../component/CardArticle";
 
 export const AddArticle = () => {
     const { store, actions } = useContext(Context);
@@ -226,7 +226,7 @@ export const AddArticle = () => {
                 </button>
             </form>
 
-            <Link to="/">
+            <Link to="/administratorHomePage">
                 <h2>Get back to home</h2>
             </Link>
 
