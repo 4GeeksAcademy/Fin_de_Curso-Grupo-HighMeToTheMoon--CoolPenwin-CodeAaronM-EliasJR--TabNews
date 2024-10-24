@@ -54,7 +54,7 @@ export const HomePage = () => {
         
         <div className="container">  
         <div className="d-flex justify-content-between align-items-center mt-4">
-            <h1 className="text-danger ms-2" style={{ fontSize: '2rem', fontWeight: 'bold' }}>HOME</h1>
+            <h1 className="text-danger ms-2" style={{ fontSize: '2rem', fontWeight: 'bold' }}>HOME User</h1>
     
             {/* Botón para mostrar u ocultar los filtros */}
             <button
